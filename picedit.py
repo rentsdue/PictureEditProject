@@ -3,7 +3,13 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
 def change_brightness(image, value):
-    return np.array([]) # to be removed when filling this function
+    row = np.shape(image)[0] #Takes row value
+    col = np.shape(image)[1] #Take column value
+    for i in range(0, row): 
+        for j in range(0, col):
+            for k in range(0, 3):
+                
+    # return np.array([]) # to be removed when filling this function
   
 def change_contrast(image, value):
     return np.array([]) # to be removed when filling this function
@@ -97,36 +103,38 @@ def menu():
         else: 
             userSelect = input("What do you want to do ? \n e - exit \n l - load a picture \n s - save the current picture \n 1 - adjust brightness \n 2 - adjust contrast \n 3 - apply grayscale \n 4 - apply blur \n 5 - edge detection \n 6 - embossed \n 7 - rectangle select \n 8 - magic wand select \n \n Your choice: ")
 
-        if userSelect.lower() == "e":
+        if userSelect == "e":
             break
-        elif userSelect.lower() == "l":
+        elif userSelect == "l":
             filename = input("Enter the filename to load: ")
             image, mask, imageLoaded = load_image(filename)
-            load_image()
-        elif userSelect.lower() == "s" and imageLoaded:
+        elif userSelect == "s" and imageLoaded:
             save_image()
-        elif userSelect.lower() == "1" and imageLoaded:
+        elif userSelect == "1" and imageLoaded:
             change_brightness()
-        elif userSelect.lower() == "2" and imageLoaded:
+        elif userSelect == "2" and imageLoaded:
             change_contrast()
-        elif userSelect.lower() == "3" and imageLoaded:
+        elif userSelect == "3" and imageLoaded:
             grayscale()
-        elif userSelect.lower() == "4" and imageLoaded:
+        elif userSelect == "4" and imageLoaded:
             blur_effect()
-        elif userSelect.lower() == "5" and imageLoaded:
+        elif userSelect == "5" and imageLoaded:
             edge_detection()
-        elif userSelect.lower() == "6" and imageLoaded:
+        elif userSelect == "6" and imageLoaded:
             embossed()
-        elif userSelect.lower() == "7" and imageLoaded:
+        elif userSelect == "7" and imageLoaded:
             rectangle_select()
-        elif userSelect.lower() == "8" and imageLoaded:
+        elif userSelect == "8" and imageLoaded:
             magic_wand_select()
         else:
-            print("Invalid Input Detected. Please Type a Valid Number or Letter.")
-    
+            print("Invalid choice. Please try again.")  # Characters that are invalid do not get print statement printed
+            if not imageLoaded:
+                userSelect = input("What do you want to do ? \n e - exit \n l - load a picture \n \n Your choice: ")
+            else: 
+                userSelect = input("What do you want to do ? \n e - exit \n l - load a picture \n s - save the current picture \n 1 - adjust brightness \n 2 - adjust contrast \n 3 - apply grayscale \n 4 - apply blur \n 5 - edge detection \n 6 - embossed \n 7 - rectangle select \n 8 - magic wand select \n \n Your choice: ")
+
 if __name__ == "__main__":
     menu()
-
 
 
 

@@ -2,25 +2,25 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-
 def change_brightness(image, value):
     image = image.copy()
-    row = np.shape(image)[0] #Takes row value
-    col = np.shape(image)[1] #Take column value
-    for i in range(0, row): 
-        for j in range(0, col):
-            for k in range(0, 1):
-                image[i][j][k] = image[i][j][k] + value
-                if (image[i][j][k] > 255):
+    for i in range(0, len(image)): 
+        for j in range(0, len(image[i])):
+            for k in range(0, len(image[j])):
+                image[i][j][k] += value
+                if (image[i][j][k] > 255): # Check if this value check should be implemented 
                     image[i][j][k] = 255
                 elif (image[i][j][k] < 0):
                     image[i][j][k] = 0
+                print(image[i][j][k])
 
     return image
-
-    # return np.array([]) # to be removed when filling this function
   
 def change_contrast(image, value):
+    image = image.copy()
+    factor = (259 * (value + 255)) / (255 * (259 - value))
+    print(factor)
+
     return np.array([]) # to be removed when filling this function
 
 def grayscale(image):
@@ -138,15 +138,9 @@ def menu():
             magic_wand_select()
         else:
             print("Invalid choice. Please try again.")  # Characters that are invalid do not get print statement printed
-            if not imageLoaded:
-                userSelect = input("What do you want to do ? \n e - exit \n l - load a picture \n \n Your choice: ")
-            else: 
-                userSelect = input("What do you want to do ? \n e - exit \n l - load a picture \n s - save the current picture \n 1 - adjust brightness \n 2 - adjust contrast \n 3 - apply grayscale \n 4 - apply blur \n 5 - edge detection \n 6 - embossed \n 7 - rectangle select \n 8 - magic wand select \n \n Your choice: ")
 
 if __name__ == "__main__":
-    image = load_image("mini_test.png")
-    change_brightness(image, 100)
-    display_image(image)
+    menu()
 
 
 

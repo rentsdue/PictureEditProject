@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-
 def change_brightness(image, value):
     return np.array([]) # to be removed when filling this function
   
@@ -57,15 +56,19 @@ def save_image(filename, image):
     mpimg.imsave(filename,img)
 
 def load_image(filename):
-    img = mpimg.imread(filename)
-    if len(img[0][0])==4: # if png file
-        img = np.delete(img, 3, 2)
-    if type(img[0][0][0])==np.float32:  # if stored as float in [0,..,1] instead of integers in [0,..,255]
-        img = img*255
-        img = img.astype(np.uint8)
-    mask = np.ones((len(img),len(img[0]))) # create a mask full of "1" of the same size of the laoded image
-    img = img.astype(np.int32)
-    return img, mask
+    try:
+        img = mpimg.imread(filename)
+        if len(img[0][0]) == 4:  # if png file
+            img = np.delete(img, 3, 2)
+        if type(img[0][0][0]) == np.float32:  # if stored as float in [0,..,1] instead of integers in [0,..,255]
+            img = img * 255
+            img = img.astype(np.uint8)
+        mask = np.ones((len(img), len(img[0])))  # create a mask full of "1" of the same size of the loaded image
+        img = img.astype(np.int32)
+        return img, mask, True  
+    except FileNotFoundError:
+        print(f"Error: File '{filename}' not found.")
+        return None, None, False 
 
 def display_image(image, mask):
     # if using Spyder, please go to "Tools -> Preferences -> IPython console -> Graphics -> Graphics Backend" and select "inline"
@@ -84,10 +87,43 @@ def display_image(image, mask):
     print("Image size is",str(len(image)),"x",str(len(image[0])))
 
 def menu():
+    image = None
+    mask = None
+    imageLoaded = False
+
+    while True:
+        if not imageLoaded:
+            userSelect = input("What do you want to do ? \n e - exit \n l - load a picture \n \n Your choice: ")
+        else: 
+            userSelect = input("What do you want to do ? \n e - exit \n l - load a picture \n s - save the current picture \n 1 - adjust brightness \n 2 - adjust contrast \n 3 - apply grayscale \n 4 - apply blur \n 5 - edge detection \n 6 - embossed \n 7 - rectangle select \n 8 - magic wand select \n \n Your choice: ")
+
+        if userSelect.lower() == "e":
+            break
+        elif userSelect.lower() == "l":
+            filename = input("Enter the filename to load: ")
+            image, mask, imageLoaded = load_image(filename)
+            load_image()
+        elif userSelect.lower() == "s" and imageLoaded:
+            save_image()
+        elif userSelect.lower() == "1" and imageLoaded:
+            change_brightness()
+        elif userSelect.lower() == "2" and imageLoaded:
+            change_contrast()
+        elif userSelect.lower() == "3" and imageLoaded:
+            grayscale()
+        elif userSelect.lower() == "4" and imageLoaded:
+            blur_effect()
+        elif userSelect.lower() == "5" and imageLoaded:
+            edge_detection()
+        elif userSelect.lower() == "6" and imageLoaded:
+            embossed()
+        elif userSelect.lower() == "7" and imageLoaded:
+            rectangle_select()
+        elif userSelect.lower() == "8" and imageLoaded:
+            magic_wand_select()
+        else:
+            print("Invalid Input Detected. Please Type a Valid Number or Letter.")
     
-    img = mask = np.array([])  
-  
-       
 if __name__ == "__main__":
     menu()
 

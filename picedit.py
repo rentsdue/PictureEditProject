@@ -3,31 +3,48 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
 def change_brightness(image, value):
-    image = image.copy()
-    for i in range(0, len(image)): 
-        for j in range(0, len(image[i])):
-            for k in range(0, len(image[j])):
-                image[i][j][k] += value
-                if (image[i][j][k] > 255): # Check if this value check should be implemented 
-                    image[i][j][k] = 255
-                elif (image[i][j][k] < 0):
-                    image[i][j][k] = 0
-                print(image[i][j][k])
+    brightImg = image.copy()
+    for i in range(len(brightImg)): 
+        for j in range(len(brightImg[i])):
+            for k in range(len(brightImg[i][j])):
+                brightImg[i][j][k] += value
+                if (brightImg[i][j][k] > 255): # Check if this value check should be implemented 
+                    brightImg[i][j][k] = 255
+                elif (brightImg[i][j][k] < 0):
+                    brightImg[i][j][k] = 0
+                print(brightImg[i][j][k])
 
-    return image
+    return brightImg
   
 def change_contrast(image, value):
-    image = image.copy()
+    contrastImg = image.copy()
     factor = (259 * (value + 255)) / (255 * (259 - value))
-    print(factor)
+    print(factor) # Used to test 
+    for i in range(len(contrastImg)): 
+        for j in range(len(contrastImg[i])):
+            for k in range(len(contrastImg[i][j])):
+                contrastImg[i][j][k] = factor * (image[i][j][k] - 128) + 128 
+                if (contrastImg[i][j][k] > 255): # Check if this value check should be implemented 
+                    contrastImg[i][j][k] = 255
+                elif (contrastImg[i][j][k] < 0):
+                    contrastImg[i][j][k] = 0
+                print(contrastImg[i][j][k])
 
-    return np.array([]) # to be removed when filling this function
+    return contrastImg
 
 def grayscale(image):
-    return np.array([]) # to be removed when filling this function
+    grayImg = image.copy()
+    for i in range(len(grayImg)):
+        for j in range(len(grayImg[i])):
+            red, green, blue = grayImg[i][j][0], grayImg[i][j][1], grayImg[i][j][2]
+            grayscaled = int(0.3 * red + 0.59 * green + 0.11 * blue)
+            for k in range(len(grayImg[i][j])):
+                grayImg[i][j][k] = grayscaled
+    return grayImg 
 
 def blur_effect(image):
-    return np.array([]) # to be removed when filling this function
+    blurredImg = image.copy()
+    return blurredImg 
 
 def edge_detection(image):
     return np.array([]) # to be removed when filling this function
@@ -123,7 +140,8 @@ def menu():
             rgbValue = int(input("Enter an input value in order to change the image brightness: "))
             change_brightness(image, rgbValue)
         elif userSelect == "2" and imageLoaded:
-            change_contrast()
+            contrastValue = int(input("Enter an input value in order to change the image contrast: "))
+            change_contrast(image, contrastValue)
         elif userSelect == "3" and imageLoaded:
             grayscale()
         elif userSelect == "4" and imageLoaded:
@@ -137,7 +155,7 @@ def menu():
         elif userSelect == "8" and imageLoaded:
             magic_wand_select()
         else:
-            print("Invalid choice. Please try again.")  # Characters that are invalid do not get print statement printed
+            print("Invalid choice. Please try again.")  
 
 if __name__ == "__main__":
     menu()

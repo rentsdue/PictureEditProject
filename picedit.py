@@ -2,13 +2,22 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
+
 def change_brightness(image, value):
+    image = image.copy()
     row = np.shape(image)[0] #Takes row value
     col = np.shape(image)[1] #Take column value
     for i in range(0, row): 
         for j in range(0, col):
-            for k in range(0, 3):
-                
+            for k in range(0, 1):
+                image[i][j][k] = image[i][j][k] + value
+                if (image[i][j][k] > 255):
+                    image[i][j][k] = 255
+                elif (image[i][j][k] < 0):
+                    image[i][j][k] = 0
+
+    return image
+
     # return np.array([]) # to be removed when filling this function
   
 def change_contrast(image, value):
@@ -111,7 +120,8 @@ def menu():
         elif userSelect == "s" and imageLoaded:
             save_image()
         elif userSelect == "1" and imageLoaded:
-            change_brightness()
+            rgbValue = int(input("Enter an input value in order to change the image brightness: "))
+            change_brightness(image, rgbValue)
         elif userSelect == "2" and imageLoaded:
             change_contrast()
         elif userSelect == "3" and imageLoaded:
@@ -134,7 +144,9 @@ def menu():
                 userSelect = input("What do you want to do ? \n e - exit \n l - load a picture \n s - save the current picture \n 1 - adjust brightness \n 2 - adjust contrast \n 3 - apply grayscale \n 4 - apply blur \n 5 - edge detection \n 6 - embossed \n 7 - rectangle select \n 8 - magic wand select \n \n Your choice: ")
 
 if __name__ == "__main__":
-    menu()
+    image = load_image("mini_test.png")
+    change_brightness(image, 100)
+    display_image(image)
 
 
 

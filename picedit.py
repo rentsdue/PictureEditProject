@@ -160,18 +160,24 @@ def menu():
             save_image()
         elif userSelect == "1" and image is not None:
             rgbValue = int(input("Enter an input value in order to change the image brightness: "))
-            change_brightness(image, rgbValue)
+            newImg = change_brightness(image, rgbValue)
+            display_image(newImg, mask)
         elif userSelect == "2" and image is not None:
             contrastValue = int(input("Enter an input value in order to change the image contrast: "))
-            change_contrast(image, contrastValue)
+            newImg = change_contrast(image, contrastValue)
+            display_image(newImg, mask)
         elif userSelect == "3" and image is not None:
-            grayscale()
+            newImg = grayscale(image)
+            display_image(newImg, mask)
         elif userSelect == "4" and image is not None:
-            blur_effect()
+            newImg = blur_effect(image)
+            display_image(newImg, mask)
         elif userSelect == "5" and image is not None:
-            edge_detection()
+            newImg = edge_detection(image)
+            display_image(newImg, mask)
         elif userSelect == "6" and image is not None:
-            embossed()
+            newImg = embossed(image)
+            display_image(newImg, mask)
         elif userSelect == "7" and image is not None:
             rectangle_select()
         elif userSelect == "8" and image is not None:
@@ -180,10 +186,7 @@ def menu():
             print("Invalid choice. Please try again.")  
 
 if __name__ == "__main__":
-    # menu()
-    image, mask = load_image("test.png")
-    display_image(image, mask)
-    change_brightness(image, 10)
+    menu()
 
 
 

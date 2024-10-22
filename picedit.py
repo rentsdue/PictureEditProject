@@ -78,8 +78,46 @@ def embossed(image):
                     newImg[i][j][k] = 0
     return newImg 
 
-def rectangle_select(image, x, y):
-    return np.array([]) # to be removed when filling this function
+def rectangle_select(image, top_left_of_rectangle, bottom_right_of_rectangle):
+
+    rectangle = np.zeros(image.shape[:2], dtype=bool)   # [:2] to just get height and width
+    (x1, y1) = top_left_of_rectangle
+    (x2, y2) = bottom_right_of_rectangle
+
+    rectangle[y1:y2, x1:x2] = True
+    return rectangle
+
+def menu():
+
+    image = np.zeros((100, 100, 3), dtype=np.uint8)  # This line of code is from chatGPT, to be replaced with actual image that your defined alr
+
+    while True:
+        try:
+            x1 = int(input("Enter the x-coordinate of the top left corner of the rectangle: "))
+            y1 = int(input("Enter the y-coordinate of the top left corner of the rectangle: "))
+            x2 = int(input("Enter the x-coordinate of the bottom right corner of the rectangle: "))
+            y2 = int(input("Enter the y-coordinate of the bottom right corner of the rectangle: "))
+
+            # Checking if coordinates make logical sense
+            if x1 < 0 or x2 < 0 or y1 < 0 or y2 < 0:
+                raise ValueError("Coordinates must be non-negative.")
+            if x1 >= x2:
+                raise ValueError("Top left corner must be to the LEFT of the bottom right corner.")
+            if y2 >= y1:
+                raise ValueError("Top left corner must be ABOVE the bottom right corner.")
+            if x1 > image.shape[1] or y1 > image.shape[0] or x2 > image.shape[1] or y2 > image.shape[0]:
+                raise ValueError("Coordinates must be within the dimensions of the image.")
+            # if number isnt an integer (decimals or empty)
+                # raise ValueError("Coordinates must be an integer (whole number with no decimals)")
+
+            top_left_of_rectangle = (x1, y1)
+            bottom_right_of_rectangle = (x2, y2)
+            rectangle = rectangle_select(image, top_left_of_rectangle, bottom_right_of_rectangle)
+            print("Rectangle successfully selected.")
+            break
+
+        except ValueError as unknown_error:
+            print(f"Error: {unknown_error}. Please try again.")
 
 def magic_wand_select(image, x, thres):                
     return np.array([]) # to be removed when filling this function

@@ -78,14 +78,16 @@ def embossed(image):
                     newImg[i][j][k] = 0
     return newImg 
 
-def rectangle_select(image, top_left_of_rectangle, bottom_right_of_rectangle):
+def rectangle_select(image, x,  y):
+    x_i = x[0]
+    x_f = x[1]
+    y_i = y[0]
+    y_f = y[1]
 
-    rectangle = np.zeros(image.shape[:2], dtype=bool)   # [:2] to just get height and width
-    (x1, y1) = top_left_of_rectangle
-    (x2, y2) = bottom_right_of_rectangle
-
-    rectangle[y1:y2, x1:x2] = True
-    return rectangle
+    rect = np.zeros((np.shape(image)[0], np.shape(image)[1]))   
+    rect[x_i:y_i+1, x_f:y_f+1] = 1
+    print(rect)
+    return rect
 
 def magic_wand_select(image, x, thres):                
     return np.array([]) # to be removed when filling this function

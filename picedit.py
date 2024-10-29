@@ -78,7 +78,7 @@ def embossed(image):
                     newImg[i][j][k] = 0
     return newImg 
 
-def rectangle_select(image, x,  y):
+def rectangle_select(image, x, y):
     x_i = x[0]
     x_f = x[1]
     y_i = y[0]
@@ -158,31 +158,11 @@ def menu():
             userSelect = input("What do you want to do ? \n e - exit \n l - load a picture \n \n Your choice: ")
         else: 
             userSelect = input("What do you want to do ? \n e - exit \n l - load a picture \n s - save the current picture \n 1 - adjust brightness \n 2 - adjust contrast \n 3 - apply grayscale \n 4 - apply blur \n 5 - edge detection \n 6 - embossed \n 7 - rectangle select \n 8 - magic wand select \n \n Your choice: ")
-
         if userSelect == "e":
             break
         elif userSelect == "l":
             filename = input("Enter the filename to load: ")
             image, mask = load_image(filename)
-            x1 = int(input("Enter the x-coordinate of the top left corner of the rectangle: "))
-            y1 = int(input("Enter the y-coordinate of the top left corner of the rectangle: "))
-            x2 = int(input("Enter the x-coordinate of the bottom right corner of the rectangle: "))
-            y2 = int(input("Enter the y-coordinate of the bottom right corner of the rectangle: "))
-
-            # Checking if coordinates make logical sense
-            if x1 < 0 or x2 < 0 or y1 < 0 or y2 < 0:
-                raise ValueError("Coordinates must be non-negative.")
-            if x1 >= x2:
-                raise ValueError("Top left corner must be to the LEFT of the bottom right corner.")
-            if y2 >= y1:
-                raise ValueError("Top left corner must be ABOVE the bottom right corner.")
-            if x1 > image.shape[1] or y1 > image.shape[0] or x2 > image.shape[1] or y2 > image.shape[0]:
-                raise ValueError("Coordinates must be within the dimensions of the image.")
-
-            top_left_of_rectangle = (x1, y1)
-            bottom_right_of_rectangle = (x2, y2)
-            rectangle = rectangle_select(image, top_left_of_rectangle, bottom_right_of_rectangle)
-            print("Rectangle successfully selected.")
         elif userSelect == "s" and image is not None:
             save_image()
         elif userSelect == "1" and image is not None:
@@ -206,7 +186,27 @@ def menu():
             newImg = embossed(image)
             display_image(newImg, mask)
         elif userSelect == "7" and image is not None:
-            rectangle_select()
+            x1 = int(input("Enter the x-coordinate of the top left corner of the rectangle: "))
+            y1 = int(input("Enter the y-coordinate of the top left corner of the rectangle: "))
+            x2 = int(input("Enter the x-coordinate of the bottom right corner of the rectangle: "))
+            y2 = int(input("Enter the y-coordinate of the bottom right corner of the rectangle: "))
+
+            # Checking if coordinates make logical sense
+            if x1 < 0 or x2 < 0 or y1 < 0 or y2 < 0:
+                raise ValueError("Coordinates must be non-negative.")
+            if x1 >= x2:
+                raise ValueError("Top left corner must be to the LEFT of the bottom right corner.")
+            if y2 <= y1:
+                raise ValueError("Top left corner must be ABOVE the bottom right corner.")
+            if x1 > image.shape[1] or y1 > image.shape[0] or x2 > image.shape[1] or y2 > image.shape[0]:
+                raise ValueError("Coordinates must be within the dimensions of the image.")
+
+            top_left_of_rectangle = (x1, y1)
+            bottom_right_of_rectangle = (x2, y2)
+            rectangle = rectangle_select(image, top_left_of_rectangle, bottom_right_of_rectangle)
+            print("Rectangle successfully selected.")
+            mask = rectangle
+            display_image(image, mask)
         elif userSelect == "8" and image is not None:
             magic_wand_select()
         else:

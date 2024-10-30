@@ -90,7 +90,40 @@ def rectangle_select(image, x, y):
     return rect
 
 def magic_wand_select(image, x, thres):                
-    return np.array([]) # to be removed when filling this function
+    row, col = image.shape
+    stack = []
+    stack.append(x)
+    visited_lst = []
+
+    while len(stack) > 0:
+        current_pix = stack.pop()
+        visited_lst.append(current_pix)
+        valid_neighbours = finding_valid_neighbours(image, current_pix, visited_lst, thres)
+        stack.extend(valid_neighbours)
+    return create_mask(visited_lst, row, col)
+
+def finding_valid_neighbours(image, current_pix, visited_lst, thres):
+    row, col = image.shape
+    neighbour_direction = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    valid_neighbours = []
+
+    for direction in neighbour_direction:
+        nb = (current_pix[0] + direction[0], current_pix[1] + direction[1])
+        if is_indeed_valid_neighbour(nb, row, col, image, current_pix, thres, visited_lst):
+            valid_neighbours.append(nb)
+    return valid_neighbours
+
+def is_indeed_valid_neighbour(nb, row, col, image, current_pix, thres, visited_lst):
+    return (0 <= nb[0] < row and 0 <= nb[1] < col and 
+            distance(image, nb, current_pix) <= thres and 
+            nb not in visited_lst)
+
+def create_mask(visited_lst, row, col):
+    msk = np.zeros((row, col), dtype=int)
+    for pix in visited_lst:
+        msk[pix[0], pix[1]] = 1
+    return msk
+
 
 def compute_edge(mask):           
     rsize, csize = len(mask), len(mask[0]) 

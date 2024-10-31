@@ -115,7 +115,7 @@ def finding_valid_neighbours(image, current_pix, visited_lst, thres):
 
 def is_indeed_valid_neighbour(nb, row, col, image, current_pix, thres, visited_lst):
     return (0 <= nb[0] < row and 0 <= nb[1] < col and 
-            distance(image, nb, current_pix) <= thres and 
+distance(image, nb, current_pix) <= thres and 
             nb not in visited_lst)
 
 def create_mask(visited_lst, row, col):
@@ -123,6 +123,10 @@ def create_mask(visited_lst, row, col):
     for pix in visited_lst:
         msk[pix[0], pix[1]] = 1
     return msk
+
+
+def distance(image, pix1, pix2):
+    return np.abs(int(image[pix1]) - int(image[pix2]))
 
 
 def compute_edge(mask):           
@@ -241,7 +245,7 @@ def menu():
             mask = rectangle
             display_image(image, mask)
         elif userSelect == "8" and image is not None:
-            magic_wand_select()
+            magic_wand_select(image, x, mask)
         else:
             print("Invalid choice. Please try again.")  
 

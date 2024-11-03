@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+import time # Remove at the very end, use it to test how long it takes for the function to run
 
 def change_brightness(image, value):
     brightImg = image.copy()
@@ -90,17 +91,18 @@ def rectangle_select(image, x, y):
     return rect
 
 def magic_wand_select(image, x, thres):                
-    row, col = image.shape
-    stack = []
-    stack.append(x)
-    visited_lst = []
+    # row, col = image.shape
+    # stack = []
+    # stack.append(x)
+    # visited_lst = []
 
-    while len(stack) > 0:
-        current_pix = stack.pop()
-        visited_lst.append(current_pix)
-        valid_neighbours = finding_valid_neighbours(image, current_pix, visited_lst, thres)
-        stack.extend(valid_neighbours)
-    return create_mask(visited_lst, row, col)
+    # while len(stack) > 0:
+    #     current_pix = stack.pop()
+    #     visited_lst.append(current_pix)
+    #     valid_neighbours = finding_valid_neighbours(image, current_pix, visited_lst, thres)
+    #     stack.extend(valid_neighbours)
+    # return create_mask(visited_lst, row, col)
+    return None
 
 def finding_valid_neighbours(image, current_pix, visited_lst, thres):
     row, col = image.shape
@@ -186,6 +188,8 @@ def display_image(image, mask):
     print("Image size is",str(len(image)),"x",str(len(image[0])))
 
 
+import time
+
 def menu():
     image = None
     mask = None
@@ -195,33 +199,66 @@ def menu():
             userSelect = input("What do you want to do ? \n e - exit \n l - load a picture \n \n Your choice: ")
         else: 
             userSelect = input("What do you want to do ? \n e - exit \n l - load a picture \n s - save the current picture \n 1 - adjust brightness \n 2 - adjust contrast \n 3 - apply grayscale \n 4 - apply blur \n 5 - edge detection \n 6 - embossed \n 7 - rectangle select \n 8 - magic wand select \n \n Your choice: ")
+        
         if userSelect == "e":
             break
         elif userSelect == "l":
             filename = input("Enter the filename to load: ")
+            start_time = time.time()
             image, mask = load_image(filename)
+            end_time = time.time()
+            print(f"Image loaded in {end_time - start_time:.4f} seconds.")
+        
         elif userSelect == "s" and image is not None:
+            start_time = time.time()
             save_image()
+            end_time = time.time()
+            print(f"Image saved in {end_time - start_time:.4f} seconds.")
+        
         elif userSelect == "1" and image is not None:
             rgbValue = int(input("Enter an input value in order to change the image brightness: "))
+            start_time = time.time()
             newImg = change_brightness(image, rgbValue)
+            end_time = time.time()
+            print(f"Brightness adjusted in {end_time - start_time:.4f} seconds.")
             display_image(newImg, mask)
+        
         elif userSelect == "2" and image is not None:
             contrastValue = int(input("Enter an input value in order to change the image contrast: "))
+            start_time = time.time()
             newImg = change_contrast(image, contrastValue)
+            end_time = time.time()
+            print(f"Contrast adjusted in {end_time - start_time:.4f} seconds.")
             display_image(newImg, mask)
+        
         elif userSelect == "3" and image is not None:
+            start_time = time.time()
             newImg = grayscale(image)
+            end_time = time.time()
+            print(f"Grayscale applied in {end_time - start_time:.4f} seconds.")
             display_image(newImg, mask)
+        
         elif userSelect == "4" and image is not None:
+            start_time = time.time()
             newImg = blur_effect(image)
+            end_time = time.time()
+            print(f"Blur applied in {end_time - start_time:.4f} seconds.")
             display_image(newImg, mask)
+        
         elif userSelect == "5" and image is not None:
+            start_time = time.time()
             newImg = edge_detection(image)
+            end_time = time.time()
+            print(f"Edge detection applied in {end_time - start_time:.4f} seconds.")
             display_image(newImg, mask)
+        
         elif userSelect == "6" and image is not None:
+            start_time = time.time()
             newImg = embossed(image)
+            end_time = time.time()
+            print(f"Embossing applied in {end_time - start_time:.4f} seconds.")
             display_image(newImg, mask)
+        
         elif userSelect == "7" and image is not None:
             x1 = int(input("Enter the x-coordinate of the top left corner of the rectangle: "))
             y1 = int(input("Enter the y-coordinate of the top left corner of the rectangle: "))
@@ -238,16 +275,24 @@ def menu():
             if x1 > image.shape[1] or y1 > image.shape[0] or x2 > image.shape[1] or y2 > image.shape[0]:
                 raise ValueError("Coordinates must be within the dimensions of the image.")
 
+            start_time = time.time()
             top_left_of_rectangle = (x1, y1)
             bottom_right_of_rectangle = (x2, y2)
             rectangle = rectangle_select(image, top_left_of_rectangle, bottom_right_of_rectangle)
-            print("Rectangle successfully selected.")
+            end_time = time.time()
+            print(f"Rectangle selected in {end_time - start_time:.4f} seconds.")
             mask = rectangle
             display_image(image, mask)
+        
         elif userSelect == "8" and image is not None:
-            magic_wand_select(image, x, mask)
+            start_time = time.time()
+            # magic_wand_select(image, x, mask)
+            end_time = time.time()
+            print(f"Magic wand selection applied in {end_time - start_time:.4f} seconds.")
+        
         else:
             print("Invalid choice. Please try again.")  
+
 
 if __name__ == "__main__":
     menu()

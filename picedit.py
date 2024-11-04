@@ -211,7 +211,7 @@ def menu():
         
         elif userSelect == "s" and image is not None:
             start_time = time.time()
-            save_image()
+            save_image(filename, image)
             end_time = time.time()
             print(f"Image saved in {end_time - start_time:.4f} seconds.")
         

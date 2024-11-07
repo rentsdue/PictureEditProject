@@ -81,6 +81,7 @@ def test():
                          0.0 ,1.0 ,1.0 ,1.0 ,0.0 ,
                          0.0 ,0.0 ,0.0 ,1.0 ,1.0 , ]).reshape(5,5)
     mask = magic_wand_select(img,(1,1),300)
+    print(mask)
     if len(image)==0 or not np.array_equal(mask_cpr,mask): print("test magic_wand_select - Problem in the magic_wand_select function output !")
     else: print("test magic_wand_select - OK !") 
    

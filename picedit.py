@@ -91,33 +91,32 @@ def rectangle_select(image, x, y):
     return rect
 
 def magic_wand_select(image, x, thres):                
-    # row, col = image.shape
-    # stack = []
-    # stack.append(x)
-    # visited_lst = []
+    row, col = np.shape(image)[:2]
+    stack = []
+    stack.append(x)
+    visited_lst = []
 
-    # while len(stack) > 0:
-    #     current_pix = stack.pop()
-    #     visited_lst.append(current_pix)
-    #     valid_neighbours = finding_valid_neighbours(image, current_pix, visited_lst, thres)
-    #     stack.extend(valid_neighbours)
-    # return create_mask(visited_lst, row, col)
-    return None
+    while len(stack) > 0:
+        current_pix = stack.pop()
+        visited_lst.append(current_pix)
+        valid_neighbours = finding_valid_neighbours(image, current_pix, visited_lst, thres,x)
+        stack.extend(valid_neighbours)
+    return create_mask(visited_lst, row, col)
 
-def finding_valid_neighbours(image, current_pix, visited_lst, thres):
-    row, col = image.shape
+def finding_valid_neighbours(image, current_pix, visited_lst, thres,x):
+    row, col,_ = image.shape
     neighbour_direction = [(-1, 0), (1, 0), (0, -1), (0, 1)]
     valid_neighbours = []
 
     for direction in neighbour_direction:
         nb = (current_pix[0] + direction[0], current_pix[1] + direction[1])
-        if is_indeed_valid_neighbour(nb, row, col, image, current_pix, thres, visited_lst):
+        if is_indeed_valid_neighbour(nb, row, col, image, current_pix, thres, visited_lst,x):
             valid_neighbours.append(nb)
     return valid_neighbours
 
-def is_indeed_valid_neighbour(nb, row, col, image, current_pix, thres, visited_lst):
+def is_indeed_valid_neighbour(nb, row, col, image, current_pix, thres, visited_lst,x):
     return (0 <= nb[0] < row and 0 <= nb[1] < col and 
-distance(image, nb, current_pix) <= thres and 
+distance(image, nb, x) <= thres and 
             nb not in visited_lst)
 
 def create_mask(visited_lst, row, col):
@@ -126,9 +125,15 @@ def create_mask(visited_lst, row, col):
         msk[pix[0], pix[1]] = 1
     return msk
 
-
+import math
 def distance(image, pix1, pix2):
-    return np.abs(int(image[pix1]) - int(image[pix2]))
+    p1=image[pix1[0],pix1[1]]
+    p2=image[pix2[0],pix2[1]]
+    dr=p1[0]-p2[0]
+    dg=p1[1]-p2[1]
+    db=p1[2]-p2[2]
+    r=(p1[0]+p2[0])/2
+    return math.sqrt((2+r/256)*(dr**2)+4*(dg**2)+(2+(255-r)/256)*(db**2))
 
 
 def compute_edge(mask):           
@@ -187,8 +192,15 @@ def display_image(image, mask):
     plt.show()
     print("Image size is",str(len(image)),"x",str(len(image[0])))
 
-
-import time
+def apply_mask(newImage, originalImage, mask):
+    finalImage = originalImage.copy()
+    for i in range(len(originalImage)):
+        for j in range(len(originalImage)[i]):
+            if(mask[i][j]==1):
+                finalImage[i][j]= newImage[i][j]
+            else:
+                pass
+        return finalImage
 
 def menu():
     image = None

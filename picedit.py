@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+import math
 import time # Remove at the very end, use it to test how long it takes for the function to run
 
 def change_brightness(image, value):
@@ -90,51 +91,40 @@ def rectangle_select(image, x, y):
     print(rect)
     return rect
 
+def distance(image, pix1, pix2):
+    p1 = image[pix1[0], pix1[1]]
+    p2 = image[pix2[0], pix2[1]]
+    deltaRed = p1[0] - p2[0]
+    deltaGreen = p1[1] - p2[1]
+    deltaBlue = p1[2] - p2[2]
+    redAvg = (p1[0] + p2[0]) / 2
+    return math.sqrt((2 + redAvg / 256) * (deltaRed ** 2) + 4 * (deltaGreen ** 2) + (2 + (255 - redAvg) / 256) * (deltaBlue ** 2))
+
 def magic_wand_select(image, x, thres):                
     row, col = np.shape(image)[:2]
-    stack = []
-    stack.append(x)
-    visited_lst = []
+    stack = [x]
+    visitedList = []
+    neighbour_directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
     while len(stack) > 0:
         current_pix = stack.pop()
-        visited_lst.append(current_pix)
-        valid_neighbours = finding_valid_neighbours(image, current_pix, visited_lst, thres,x)
-        stack.extend(valid_neighbours)
-    return create_mask(visited_lst, row, col)
+        if current_pix not in visitedList:
+            visitedList.append(current_pix)
+            for direction in neighbour_directions:
+                nb = (current_pix[0] + direction[0], current_pix[1] + direction[1])
+                if (0 <= nb[0] < row and 0 <= nb[1] < col and 
+                    distance(image, nb, x) <= thres and 
+                    nb not in visitedList):
+                    stack.append(nb)
+                    
+    return create_mask(visitedList, row, col)
 
-def finding_valid_neighbours(image, current_pix, visited_lst, thres,x):
-    row, col,_ = image.shape
-    neighbour_direction = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-    valid_neighbours = []
 
-    for direction in neighbour_direction:
-        nb = (current_pix[0] + direction[0], current_pix[1] + direction[1])
-        if is_indeed_valid_neighbour(nb, row, col, image, current_pix, thres, visited_lst,x):
-            valid_neighbours.append(nb)
-    return valid_neighbours
-
-def is_indeed_valid_neighbour(nb, row, col, image, current_pix, thres, visited_lst,x):
-    return (0 <= nb[0] < row and 0 <= nb[1] < col and 
-distance(image, nb, x) <= thres and 
-            nb not in visited_lst)
-
-def create_mask(visited_lst, row, col):
+def create_mask(visitedList, row, col):
     msk = np.zeros((row, col), dtype=int)
-    for pix in visited_lst:
+    for pix in visitedList:
         msk[pix[0], pix[1]] = 1
     return msk
-
-import math
-def distance(image, pix1, pix2):
-    p1=image[pix1[0],pix1[1]]
-    p2=image[pix2[0],pix2[1]]
-    dr=p1[0]-p2[0]
-    dg=p1[1]-p2[1]
-    db=p1[2]-p2[2]
-    r=(p1[0]+p2[0])/2
-    return math.sqrt((2+r/256)*(dr**2)+4*(dg**2)+(2+(255-r)/256)*(db**2))
-
 
 def compute_edge(mask):           
     rsize, csize = len(mask), len(mask[0]) 
@@ -227,12 +217,17 @@ def menu():
         
         elif userSelect == "s" and image is not None:
             start_time = time.time()
-            save_image(filename, newImg)  # Save the modified image
+            save_image(filename, newImg) 
             end_time = time.time()
             print(f"Image saved in {end_time - start_time:.4f} seconds.")
         
         elif userSelect == "1" and image is not None:
-            rgbValue = int(input("Enter an input value to change the image brightness: "))
+            while True:
+                try:
+                    rgbValue = int(input("Enter an input value to change the image brightness: "))
+                    break 
+                except ValueError:
+                    print("Invalid input. Please enter an integer.")
             start_time = time.time()
             modifiedImg = change_brightness(newImg, rgbValue)
             if useNewMask:
@@ -241,10 +236,15 @@ def menu():
                 newImg = modifiedImg
             end_time = time.time()
             print(f"Brightness adjusted in {end_time - start_time:.4f} seconds.")
-            display_image(newImg, newMask if useNewMask else mask)
+            display_image(newImg, mask)
         
         elif userSelect == "2" and image is not None:
-            contrastValue = int(input("Enter an input value to change the image contrast: "))
+            while True:
+                try:
+                    contrastValue = int(input("Enter an input value to change the image contrast: "))
+                    break 
+                except ValueError:
+                    print("Invalid input. Please enter an integer.")
             start_time = time.time()
             modifiedImg = change_contrast(newImg, contrastValue)
             if useNewMask:
@@ -253,7 +253,7 @@ def menu():
                 newImg = modifiedImg
             end_time = time.time()
             print(f"Contrast adjusted in {end_time - start_time:.4f} seconds.")
-            display_image(newImg, newMask if useNewMask else mask)
+            display_image(newImg, mask)
         
         elif userSelect == "3" and image is not None:
             start_time = time.time()
@@ -264,7 +264,7 @@ def menu():
                 newImg = modifiedImg
             end_time = time.time()
             print(f"Grayscale applied in {end_time - start_time:.4f} seconds.")
-            display_image(newImg, newMask if useNewMask else mask)
+            display_image(newImg, mask)
         
         elif userSelect == "4" and image is not None:
             start_time = time.time()
@@ -300,20 +300,25 @@ def menu():
             display_image(newImg, mask)
         
         elif userSelect == "7" and image is not None:
-            x1 = int(input("Enter the x-coordinate of the top left corner of the rectangle: "))
-            y1 = int(input("Enter the y-coordinate of the top left corner of the rectangle: "))
-            x2 = int(input("Enter the x-coordinate of the bottom right corner of the rectangle: "))
-            y2 = int(input("Enter the y-coordinate of the bottom right corner of the rectangle: "))
-
-            if x1 < 0 or x2 < 0 or y1 < 0 or y2 < 0:
-                raise ValueError("Coordinates must be non-negative.")
-            if x1 >= x2:
-                raise ValueError("Top left corner must be to the LEFT of the bottom right corner.")
-            if y2 <= y1:
-                raise ValueError("Top left corner must be ABOVE the bottom right corner.")
-            if x1 > image.shape[1] or y1 > image.shape[0] or x2 > image.shape[1] or y2 > image.shape[0]:
-                raise ValueError("Coordinates must be within the dimensions of the image.")
-
+            while True:
+                try:
+                    x1 = int(input("Enter the x-coordinate of the top left corner of the rectangle: "))
+                    y1 = int(input("Enter the y-coordinate of the top left corner of the rectangle: "))
+                    x2 = int(input("Enter the x-coordinate of the bottom right corner of the rectangle: "))
+                    y2 = int(input("Enter the y-coordinate of the bottom right corner of the rectangle: "))
+                    if x1 < 0 or x2 < 0 or y1 < 0 or y2 < 0:
+                        print("Coordinates must be non-negative. Please try again.")
+                    elif x1 >= x2:
+                        print("Top left corner must be to the LEFT of the bottom right corner. Please try again.")
+                    elif y2 <= y1:
+                        print("Top left corner must be ABOVE the bottom right corner. Please try again.")
+                    elif x1 > image.shape[1] or y1 > image.shape[0] or x2 > image.shape[1] or y2 > image.shape[0]:
+                        print("Coordinates must be within the dimensions of the image. Please try again.")
+                    else:
+                        break
+                except ValueError:
+                    print("Invalid input. Please enter an integer value.")
+            
             start_time = time.time()
             top = (x1, y1)
             bottom = (x2, y2)
@@ -324,9 +329,24 @@ def menu():
             display_image(newImg, newMask)
         
         elif userSelect == "8" and image is not None:
-            xCoord = int(input("Please enter an x-coordinate: "))
-            yCoord = int(input("Please enter a y-coordinate: "))
-            thres = int(input("Please enter a threshold: "))
+            while True:
+                try:
+                    xCoord = int(input("Please enter an x-coordinate: "))
+                    yCoord = int(input("Please enter a y-coordinate: "))
+                    thres = int(input("Please enter a threshold: "))
+                    if xCoord < 0 or yCoord < 0:
+                        print("Coordinates must be non-negative. Please try again.")
+                        continue
+                    elif xCoord > image.shape[1] or yCoord > image.shape[0]:
+                        print("Coordinates must be within the dimensions of the image. Please try again.")
+                        continue
+                    
+                    if thres < 0:
+                        print("Coordinates must be non-negative. Please try again.")
+                        continue
+                    break
+                except ValueError:
+                    print("Invalid input. Please enter an integer value.")
             start_time = time.time()
             newMask = magic_wand_select(image, (xCoord, yCoord), thres)
             useNewMask = True

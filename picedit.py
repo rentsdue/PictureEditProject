@@ -192,7 +192,7 @@ def display_image(image, mask):
     plt.show()
     print("Image size is",str(len(image)),"x",str(len(image[0])))
 
-def apply_mask(newImage, originalImage, mask):
+def applyMask(newImage, originalImage, mask):
     finalImage = originalImage.copy()
     for i in range(len(originalImage)):
         for j in range(len(originalImage[i])):
@@ -221,7 +221,7 @@ def menu():
             filename = input("Enter the filename to load: ")
             start_time = time.time()
             image, mask = load_image(filename)
-            newImg = image.copy()  # Ensure `newImg` is a copy of the loaded image
+            newImg = image.copy()
             end_time = time.time()
             print(f"Image loaded in {end_time - start_time:.4f} seconds.")
         
@@ -235,7 +235,10 @@ def menu():
             rgbValue = int(input("Enter an input value to change the image brightness: "))
             start_time = time.time()
             modifiedImg = change_brightness(newImg, rgbValue)
-            newImg = apply_mask(newImg, modifiedImg, newMask) if useNewMask and newMask is not None else modifiedImg
+            if useNewMask:
+                newImg = applyMask(newImg, modifiedImg, newMask) 
+            else:
+                newImg = modifiedImg
             end_time = time.time()
             print(f"Brightness adjusted in {end_time - start_time:.4f} seconds.")
             display_image(newImg, newMask if useNewMask else mask)
@@ -244,7 +247,10 @@ def menu():
             contrastValue = int(input("Enter an input value to change the image contrast: "))
             start_time = time.time()
             modifiedImg = change_contrast(newImg, contrastValue)
-            newImg = apply_mask(newImg, modifiedImg, newMask) if useNewMask and newMask is not None else modifiedImg
+            if useNewMask:
+                newImg = applyMask(newImg, modifiedImg, newMask) 
+            else:
+                newImg = modifiedImg
             end_time = time.time()
             print(f"Contrast adjusted in {end_time - start_time:.4f} seconds.")
             display_image(newImg, newMask if useNewMask else mask)
@@ -252,7 +258,10 @@ def menu():
         elif userSelect == "3" and image is not None:
             start_time = time.time()
             modifiedImg = grayscale(newImg)
-            newImg = apply_mask(newImg, modifiedImg, newMask) if useNewMask and newMask is not None else modifiedImg
+            if useNewMask:
+                newImg = applyMask(newImg, modifiedImg, newMask) 
+            else:
+                newImg = modifiedImg
             end_time = time.time()
             print(f"Grayscale applied in {end_time - start_time:.4f} seconds.")
             display_image(newImg, newMask if useNewMask else mask)
@@ -260,26 +269,35 @@ def menu():
         elif userSelect == "4" and image is not None:
             start_time = time.time()
             modifiedImg = blur_effect(newImg)
-            newImg = apply_mask(newImg, modifiedImg, newMask) if useNewMask and newMask is not None else modifiedImg
+            if useNewMask:
+                newImg = applyMask(newImg, modifiedImg, newMask) 
+            else:
+                newImg = modifiedImg
             end_time = time.time()
             print(f"Blur applied in {end_time - start_time:.4f} seconds.")
-            display_image(newImg, newMask if useNewMask else mask)
+            display_image(newImg, mask)
         
         elif userSelect == "5" and image is not None:
             start_time = time.time()
             modifiedImg = edge_detection(newImg)
-            newImg = apply_mask(newImg, modifiedImg, newMask) if useNewMask and newMask is not None else modifiedImg
+            if useNewMask:
+                newImg = applyMask(newImg, modifiedImg, newMask) 
+            else:
+                newImg = modifiedImg
             end_time = time.time()
             print(f"Edge detection applied in {end_time - start_time:.4f} seconds.")
-            display_image(newImg, newMask if useNewMask else mask)
+            display_image(newImg, mask)
         
         elif userSelect == "6" and image is not None:
             start_time = time.time()
             modifiedImg = embossed(newImg)
-            newImg = apply_mask(newImg, modifiedImg, newMask) if useNewMask and newMask is not None else modifiedImg
+            if useNewMask:
+                newImg = applyMask(newImg, modifiedImg, newMask) 
+            else:
+                newImg = modifiedImg
             end_time = time.time()
             print(f"Embossing applied in {end_time - start_time:.4f} seconds.")
-            display_image(newImg, newMask if useNewMask else mask)
+            display_image(newImg, mask)
         
         elif userSelect == "7" and image is not None:
             x1 = int(input("Enter the x-coordinate of the top left corner of the rectangle: "))

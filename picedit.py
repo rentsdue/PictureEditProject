@@ -243,8 +243,12 @@ def menu():
         elif userSelect == "1" and image is not None:
             while True:
                 try:
-                    rgbValue = int(input("Enter an input value to change the image brightness (has to be an integer): "))
-                    break 
+                    rgbValue = int(
+                        input("Enter an input value to change the image brightness (has to be an integer): "))
+                    if rgbValue < -250 or rgbValue > 250:
+                        print("Please input an integer between -250 and 250")
+                        continue
+                    break
                 except ValueError:
                     print("Invalid input. Please enter an integer.")
             start_time = time.time()

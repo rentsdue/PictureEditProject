@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import math
-import time # Remove at the very end, use it to test how long it takes for the function to run
+import time 
 
 def change_brightness(image, value):
     brightImg = image.copy()
@@ -225,7 +225,18 @@ def menu():
         
         elif userSelect == "s" and image is not None:
             start_time = time.time()
-            save_image(filename, newImg) 
+            newFileName = input("Enter the name of your new file: ")
+            while True:
+                imgFormat = input("What would you like to save your format as? Click 1 for .jpg, Click 2 for .png! ")
+                if imgFormat == "1":
+                    imgFormat = ".jpg"
+                    break
+                elif imgFormat == "2":
+                    imgFormat = ".png"
+                    break
+                else:
+                    print("Invalid input. Please try again!")
+            save_image(newFileName + imgFormat, newImg.astype('uint8'))
             end_time = time.time()
             print(f"Image saved in {end_time - start_time:.4f} seconds.")
         
@@ -310,23 +321,49 @@ def menu():
         elif userSelect == "7" and image is not None:
             while True:
                 try:
-                    x1 = int(input(f"Enter the x-coordinate of the top left corner of the rectangle (Must be an integer between 0 to {image.shape[1]}): "))
-                    y1 = int(input(f"Enter the y-coordinate of the top left corner of the rectangle (Must be an integer between 0 to {image.shape[0]}): "))
-                    x2 = int(input(f"Enter the x-coordinate of the bottom right corner of the rectangle (Must be an integer between {x1} and {image.shape[1]}): "))
-                    y2 = int(input(f"Enter the y-coordinate of the bottom right corner of the rectangle (Must to be an integer between {y1} and {image.shape[0]}): "))
-                    if x1 < 0 or x2 < 0 or y1 < 0 or y2 < 0:
-                        print("Coordinates must be non-negative. Please try again.")
-                    elif x1 >= x2:
-                        print("Top left corner must be to the LEFT of the bottom right corner. Please try again.")
-                    elif y2 <= y1:
-                        print("Top left corner must be ABOVE the bottom right corner. Please try again.")
-                    elif x1 > image.shape[1] or y1 > image.shape[0] or x2 > image.shape[1] or y2 > image.shape[0]:
-                        print("Coordinates must be within the dimensions of the image. Please try again.")
-                    else:
-                        break
+                    while True:
+                        x1 = int(input(f"Enter the x-coordinate of the top left corner of the rectangle (Must be an integer between 0 to {image.shape[1] - 1}): "))
+                        if x1 < 0:
+                            print("x-coordinate must be non-negative. Please try again.")
+                        elif x1 >= image.shape[1]:
+                            print(f"Coordinates must be within the dimensions of the image, which are {image.shape[1]} x {image.shape[0]}. Please try again.")
+                        else:
+                            break
+
+                    while True:
+                        y1 = int(input(f"Enter the y-coordinate of the top left corner of the rectangle (Must be an integer between 0 to {image.shape[0] - 1}): "))
+                        if y1 < 0:
+                            print("y-coordinate must be non-negative. Please try again.")
+                        elif y1 >= image.shape[0]:
+                            print(f"Coordinates must be within the dimensions of the image, which are {image.shape[1]} x {image.shape[0] - 1}. Please try again.")
+                        else:
+                            break
+
+                    while True:
+                        x2 = int(input(f"Enter the x-coordinate of the bottom right corner of the rectangle (Must be an integer between {x1} and {image.shape[1]}): "))
+                        if x2 < 0:
+                            print("x-coordinate must be non-negative. Please try again.")
+                        elif x2 > image.shape[1]:
+                            print(f"Coordinates must be within the dimensions of the image, which are {image.shape[1]} x {image.shape[0]}. Please try again.")
+                        elif x2 <= x1:
+                            print(f"Bottom right corner must be to the RIGHT of the top left corner (coordinate: {x1}, {y1}). Please try again.")
+                        else:
+                            break
+
+                    while True:
+                        y2 = int(input(f"Enter the y-coordinate of the bottom right corner of the rectangle (Must be an integer between {y1} and {image.shape[0]}): "))
+                        if y2 < 0:
+                            print("y-coordinate must be non-negative. Please try again.")
+                        elif y2 > image.shape[0]:
+                            print(f"Coordinates must be within the dimensions of the image, which are {image.shape[1]} x {image.shape[0]}. Please try again.")
+                        elif y2 <= y1:
+                            print(f"Bottom right corner must be to the BOTTOM of the top left corner (coordinate: {x1}, {y1}). Please try again.")
+                        else:
+                            break
+                    break                 
                 except ValueError:
                     print("Invalid input. Please enter an integer value.")
-            
+
             start_time = time.time()
             top = (x1, y1)
             bottom = (x2, y2)
@@ -335,23 +372,34 @@ def menu():
             end_time = time.time()
             print(f"Rectangle selected in {end_time - start_time:.4f} seconds.")
             display_image(newImg, newMask)
+
         
         elif userSelect == "8" and image is not None:
             while True:
                 try:
-                    xCoord = int(input(f"Please enter an x-coordinate (Must be between 0 and {image.shape[1]}): "))
-                    yCoord = int(input(f"Please enter a y-coordinate (Must be between 0 and {image.shape[0]}): "))
+                    while True:
+                        xCoord = int(input(f"Please enter an x-coordinate (Must be between 0 and {image.shape[1] - 1}): "))
+                        if xCoord < 0:
+                            print("Coordinates must be non-negative. Please try again.")
+                        elif xCoord >= image.shape[1]:
+                            print(f"Coordinates must be within the dimensions of the image, which are {image.shape[1]} x {image.shape[0]}. Please try again.")
+                        else:
+                            break
+
+                    while True:
+                        yCoord = int(input(f"Please enter a y-coordinate (Must be between 0 and {image.shape[0] - 1}): "))
+                        if yCoord < 0:
+                            print("Coordinates must be non-negative. Please try again.")
+                        elif yCoord >= image.shape[0]:
+                            print(f"Coordinates must be within the dimensions of the image, which are {image.shape[1]} x {image.shape[0]}. Please try again.")
+                        else:
+                            break
+                        
                     thres = int(input("Please enter a threshold: "))
-                    if xCoord < 0 or yCoord < 0:
-                        print("Coordinates must be non-negative. Please try again.")
-                        continue
-                    elif xCoord > image.shape[1] or yCoord > image.shape[0]:
-                        print("Coordinates must be within the dimensions of the image, which are. Please try again.")
-                        continue
                     if thres < 0:
                         print("The threshold value must be non-negative. Please try again.")
-                        continue
-                    break
+                        continue 
+                    break  
                 except ValueError:
                     print("Invalid input. Please enter an integer value.")
             start_time = time.time()

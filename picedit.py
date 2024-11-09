@@ -190,7 +190,7 @@ def applyMask(newImage, originalImage, mask):
                 finalImage[i][j]= newImage[i][j]
             else:
                 pass
-        return finalImage
+    return finalImage
 
 def menu():
     image = None
@@ -206,12 +206,20 @@ def menu():
             userSelect = input("What do you want to do ? \n e - exit \n l - load a picture \n s - save the current picture \n 1 - adjust brightness \n 2 - adjust contrast \n 3 - apply grayscale \n 4 - apply blur \n 5 - edge detection \n 6 - embossed \n 7 - rectangle select \n 8 - magic wand select \n \n Your choice: ")
         
         if userSelect == "e":
+            print("Thank you very much for using this picture editor. Have a nice day!")
             break
         elif userSelect == "l":
-            filename = input("Enter the filename to load: ")
-            start_time = time.time()
-            image, mask = load_image(filename)
-            newImg = image.copy()
+            while True:
+                try:
+                    filename = input("Enter the filename to load: ")
+                    start_time = time.time()
+                    image, mask = load_image(filename)
+                    newImg = image.copy()
+                    display_image(image, mask)
+                    break
+                except Exception as e:
+                    print(f"An error occurred: {e}. Please enter a valid file name. You might have forgotten to input \".jpg\" or \".png\" in your file name.")
+            
             end_time = time.time()
             print(f"Image loaded in {end_time - start_time:.4f} seconds.")
         
@@ -224,14 +232,14 @@ def menu():
         elif userSelect == "1" and image is not None:
             while True:
                 try:
-                    rgbValue = int(input("Enter an input value to change the image brightness: "))
+                    rgbValue = int(input("Enter an input value to change the image brightness (has to be an integer): "))
                     break 
                 except ValueError:
                     print("Invalid input. Please enter an integer.")
             start_time = time.time()
             modifiedImg = change_brightness(newImg, rgbValue)
             if useNewMask:
-                newImg = applyMask(newImg, modifiedImg, newMask) 
+                newImg = applyMask(modifiedImg, newImg, newMask) 
             else:
                 newImg = modifiedImg
             end_time = time.time()
@@ -241,14 +249,14 @@ def menu():
         elif userSelect == "2" and image is not None:
             while True:
                 try:
-                    contrastValue = int(input("Enter an input value to change the image contrast: "))
+                    contrastValue = int(input("Enter an input value to change the image contrast (has to be an integer): "))
                     break 
                 except ValueError:
                     print("Invalid input. Please enter an integer.")
             start_time = time.time()
             modifiedImg = change_contrast(newImg, contrastValue)
             if useNewMask:
-                newImg = applyMask(newImg, modifiedImg, newMask) 
+                newImg = applyMask(modifiedImg, newImg, newMask) 
             else:
                 newImg = modifiedImg
             end_time = time.time()
@@ -259,7 +267,7 @@ def menu():
             start_time = time.time()
             modifiedImg = grayscale(newImg)
             if useNewMask:
-                newImg = applyMask(newImg, modifiedImg, newMask) 
+                newImg = applyMask(modifiedImg, newImg, newMask) 
             else:
                 newImg = modifiedImg
             end_time = time.time()
@@ -270,7 +278,7 @@ def menu():
             start_time = time.time()
             modifiedImg = blur_effect(newImg)
             if useNewMask:
-                newImg = applyMask(newImg, modifiedImg, newMask) 
+                newImg = applyMask(modifiedImg, newImg, newMask)  
             else:
                 newImg = modifiedImg
             end_time = time.time()
@@ -281,7 +289,7 @@ def menu():
             start_time = time.time()
             modifiedImg = edge_detection(newImg)
             if useNewMask:
-                newImg = applyMask(newImg, modifiedImg, newMask) 
+                newImg = applyMask(modifiedImg, newImg, newMask) 
             else:
                 newImg = modifiedImg
             end_time = time.time()
@@ -291,8 +299,8 @@ def menu():
         elif userSelect == "6" and image is not None:
             start_time = time.time()
             modifiedImg = embossed(newImg)
-            if useNewMask:
-                newImg = applyMask(newImg, modifiedImg, newMask) 
+            if (useNewMask):
+                newImg = applyMask(modifiedImg, newImg, newMask)  
             else:
                 newImg = modifiedImg
             end_time = time.time()
@@ -302,10 +310,10 @@ def menu():
         elif userSelect == "7" and image is not None:
             while True:
                 try:
-                    x1 = int(input("Enter the x-coordinate of the top left corner of the rectangle: "))
-                    y1 = int(input("Enter the y-coordinate of the top left corner of the rectangle: "))
-                    x2 = int(input("Enter the x-coordinate of the bottom right corner of the rectangle: "))
-                    y2 = int(input("Enter the y-coordinate of the bottom right corner of the rectangle: "))
+                    x1 = int(input(f"Enter the x-coordinate of the top left corner of the rectangle (Must be an integer between 0 to {image.shape[1]}): "))
+                    y1 = int(input(f"Enter the y-coordinate of the top left corner of the rectangle (Must be an integer between 0 to {image.shape[0]}): "))
+                    x2 = int(input(f"Enter the x-coordinate of the bottom right corner of the rectangle (Must be an integer between {x1} and {image.shape[1]}): "))
+                    y2 = int(input(f"Enter the y-coordinate of the bottom right corner of the rectangle (Must to be an integer between {y1} and {image.shape[0]}): "))
                     if x1 < 0 or x2 < 0 or y1 < 0 or y2 < 0:
                         print("Coordinates must be non-negative. Please try again.")
                     elif x1 >= x2:
@@ -331,18 +339,17 @@ def menu():
         elif userSelect == "8" and image is not None:
             while True:
                 try:
-                    xCoord = int(input("Please enter an x-coordinate: "))
-                    yCoord = int(input("Please enter a y-coordinate: "))
+                    xCoord = int(input(f"Please enter an x-coordinate (Must be between 0 and {image.shape[1]}): "))
+                    yCoord = int(input(f"Please enter a y-coordinate (Must be between 0 and {image.shape[0]}): "))
                     thres = int(input("Please enter a threshold: "))
                     if xCoord < 0 or yCoord < 0:
                         print("Coordinates must be non-negative. Please try again.")
                         continue
                     elif xCoord > image.shape[1] or yCoord > image.shape[0]:
-                        print("Coordinates must be within the dimensions of the image. Please try again.")
+                        print("Coordinates must be within the dimensions of the image, which are. Please try again.")
                         continue
-                    
                     if thres < 0:
-                        print("Coordinates must be non-negative. Please try again.")
+                        print("The threshold value must be non-negative. Please try again.")
                         continue
                     break
                 except ValueError:
@@ -356,6 +363,7 @@ def menu():
         
         else:
             print("Invalid choice. Please try again.")
+            continue
 
 if __name__ == "__main__":
     menu()

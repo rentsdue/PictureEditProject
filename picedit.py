@@ -81,13 +81,23 @@ def embossed(image):
     return newImg 
 
 def rectangle_select(image, x, y):
+    rows = np.shape(image)[0]
+    cols = np.shape(image)[1]
+
     x_i = x[0]
     x_f = x[1]
     y_i = y[0]
     y_f = y[1]
+    
 
     rect = np.zeros((np.shape(image)[0], np.shape(image)[1]))   
     rect[x_i:y_i+1, x_f:y_f+1] = 1
+
+    if x_i < 0 or x_i > rows or x_f < 0 or x_f > rows:
+        raise ValueError("x-coordinates are invalid.")
+    if y_i < 0 or y_i > cols or y_f < 0 or y_f > cols:
+        raise ValueError("y-coordinates are invalid.") #Refine the codes, when this works for rectangle select, it should work for grayscale function
+
     print(rect)
     return rect
 

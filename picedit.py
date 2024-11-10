@@ -5,10 +5,11 @@ import math
 import time 
 
 def change_brightness(image, value):
+    rows, columns, colors = image.shape
     brightImg = image.copy()
-    for i in range(len(image)): 
-        for j in range(len(image[i])):
-            for k in range(len(image[i][j])):
+    for i in range(rows): 
+        for j in range(columns):
+            for k in range(colors):
                 brightImg[i][j][k] += value
                 if (brightImg[i][j][k] > 255):
                     brightImg[i][j][k] = 255
@@ -18,11 +19,12 @@ def change_brightness(image, value):
     return brightImg
 
 def change_contrast(image, value):
+    rows, columns, colors = image.shape
     contrastImg = image.copy()
     factor = (259 * (value + 255)) / (255 * (259 - value))
-    for i in range(len(image)): 
-        for j in range(len(image[i])):
-            for k in range(len(image[i][j])):
+    for i in range(rows): 
+        for j in range(columns):
+            for k in range(colors):
                 contrastImg[i][j][k] = factor * (image[i][j][k] - 128) + 128 
                 if (contrastImg[i][j][k] > 255): 
                     contrastImg[i][j][k] = 255
@@ -31,22 +33,24 @@ def change_contrast(image, value):
     return contrastImg
 
 def grayscale(image):
+    rows, columns, colors = image.shape
     grayImg = image.copy()
-    for i in range(len(image)):
-        for j in range(len(image[i])):
+    for i in range(rows):
+        for j in range(columns):
             red = grayImg[i][j][0]
             green = grayImg[i][j][1]
             blue = grayImg[i][j][2]
             grayscaled = int(0.3 * red + 0.59 * green + 0.11 * blue)
-            for k in range(len(image[i][j])):
+            for k in range(colors):
                 grayImg[i][j][k] = grayscaled
     return grayImg 
 
 def blur_effect(image):
     blurredImg = image.copy()
-    for i in range(1, len(image) - 1): 
-        for j in range(1, len(image[i]) - 1):
-            for k in range(len(image[i][j])):
+    rows, columns, colors = image.shape
+    for i in range(1, rows- 1): 
+        for j in range(1, columns - 1):
+            for k in range(colors):
                 blurredImg[i][j][k] = 0.0625 * image[i - 1][j - 1][k] + 0.125 * image[i - 1][j][k] + 0.0625 * image[i - 1][j + 1][k]  + 0.125 * image[i][j - 1][k]  + 0.25 * image[i][j][k] + 0.125 * image[i][j + 1][k]+ 0.0625 * image[i + 1][j - 1][k] + 0.125 * image[i + 1][j][k] + 0.0625 * image[i + 1][j + 1][k]
                 if (blurredImg[i][j][k] > 255):  
                     blurredImg[i][j][k] = 255
@@ -56,9 +60,10 @@ def blur_effect(image):
 
 def edge_detection(image):
     newImg = image.copy()
-    for i in range(1, len(image) - 1): 
-        for j in range(1, len(image[i]) - 1):
-            for k in range(len(image[i][j])):
+    rows, columns, colors = image.shape
+    for i in range(1, rows - 1): 
+        for j in range(1, columns - 1):
+            for k in range(colors):
                 newImg[i][j][k] =  (-1 * image[i - 1][j - 1][k]) + (-1 * image[i - 1][j][k]) + (-1 * image[i - 1][j + 1][k] ) + (-1 * image[i][j - 1][k]) + (8 * image[i][j][k]) + (-1 * image[i][j + 1][k]) + (-1 * image[i + 1][j - 1][k]) + (-1 * image[i + 1][j][k]) + (-1 * image[i + 1][j + 1][k]) 
                 newImg[i][j][k] += 128
                 if (newImg[i][j][k] > 255):  
@@ -69,9 +74,10 @@ def edge_detection(image):
 
 def embossed(image):
     newImg = image.copy()
-    for i in range(1, len(image) - 1): 
-        for j in range(1, len(image[i]) - 1):
-            for k in range(len(image[i][j])):
+    rows, columns, colors = image.shape
+    for i in range(1, rows - 1): 
+        for j in range(1, columns - 1):
+            for k in range(colors):
                 newImg[i][j][k] =  (-1 * image[i - 1][j - 1][k]) + (-1 * image[i - 1][j][k]) + (-1 * image[i][j - 1][k]) + (image[i][j + 1][k]) + (image[i + 1][j][k]) + (image[i + 1][j + 1][k]) 
                 newImg[i][j][k] += 128
                 if (newImg[i][j][k] > 255):  
@@ -90,8 +96,8 @@ def rectangle_select(image, x, y):
     y_f = y[1]
     
 
-    rect = np.zeros((np.shape(image)[0], np.shape(image)[1]))   
-    rect[x_i:y_i+1, x_f:y_f+1] = 1
+    rect = np.zeros((rows, cols))   
+    rect[x_i : y_i + 1, x_f : y_f + 1] = 1
 
     print(rect)
     return rect

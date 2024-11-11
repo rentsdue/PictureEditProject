@@ -103,44 +103,63 @@ def rectangle_select(image, x, y):
     return rect
 
 def distance(image, pix1, pix2):
+    #Finding the RGB values of the 2 pixels
     p1 = image[pix1[0], pix1[1]]
     p2 = image[pix2[0], pix2[1]]
+    #Finding difference between the 3 colors
     deltaRed = p1[0] - p2[0]
     deltaGreen = p1[1] - p2[1]
     deltaBlue = p1[2] - p2[2]
     redAvg = (p1[0] + p2[0]) / 2
+    #Using formula given in project document section 2.3.2
     return math.sqrt((2 + redAvg / 256) * (deltaRed ** 2) + 4 * (deltaGreen ** 2) + (2 + (255 - redAvg) / 256) * (deltaBlue ** 2))
 
-def magic_wand_select(image, x, thres):                
+def magic_wand_select(image, x, thres):
+    #Finding the dimensions of the image
     row, column = np.shape(image)[:2]
+    #Starting pixel is x
     stack = []
     stack.append(x)
+    #Empty list to be filled up by visited pixels
     visitedList = []
 
     while len(stack) > 0:
+        #Pop the current pixel from the stack and add it to visited list
         currentPix = stack.pop()
         visitedList.append(currentPix)
+        #Find valid neighbours to add to the stack
         validNeighbors = findingValidNeighbors(image, currentPix, visitedList, thres,x)
         stack.extend(validNeighbors)
+    #Create a mask from the list of pixels 
     return create_mask(visitedList, row, column)
 
+#Function to find valid neighbouring pixels, based on color threshold
 def findingValidNeighbors(image, currentPix, visitedList, thres,x):
     row, col,_ = image.shape
+    #Up, down, left, right respectively
     neighbour_direction = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    #List to store valid neighbors
     validNeighbors = []
 
     for direction in neighbour_direction:
         nb = (currentPix[0] + direction[0], currentPix[1] + direction[1])
+        #Checking if neighbor is valid or not (not out of bounds, within threshold, not visited)
+        #Then adding them if they are valid
         if isValidNeighbor(nb, row, col, image, currentPix, thres, visitedList,x):
             validNeighbors.append(nb)
     return validNeighbors
 
+#Function to check if neighbor is valid
 def isValidNeighbor(nb, row, col, image, currentPix, thres, visitedList,x):
+    #not out of bounds, within threshold, not visited
     return (0 <= nb[0] < row and 0 <= nb[1] < col and distance(image, nb, x) <= thres and nb not in visitedList)
 
 
+#Function to create a mask from selected pixels
 def create_mask(visitedList, row, col):
+    #Empty mask filled with zeros
     msk = np.zeros((row, col), dtype=int)
+    #Make pixels that are in visited list as 1 in the mask (instead of zero)
     for pix in visitedList:
         msk[pix[0], pix[1]] = 1
     return msk

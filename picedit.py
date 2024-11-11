@@ -112,32 +112,31 @@ def distance(image, pix1, pix2):
     return math.sqrt((2 + redAvg / 256) * (deltaRed ** 2) + 4 * (deltaGreen ** 2) + (2 + (255 - redAvg) / 256) * (deltaBlue ** 2))
 
 def magic_wand_select(image, x, thres):                
-    row, col = image.shape
+    row, col = np.shape(image)[:2]
     stack = []
     stack.append(x)
-    visited_lst = []
+    visitedList = []
 
     while len(stack) > 0:
-        current_pix = stack.pop()
-        visited_lst.append(current_pix)
-        valid_neighbours = finding_valid_neighbours(image, current_pix, visited_lst, thres)
-        stack.extend(valid_neighbours)
-    return create_mask(visited_lst, row, col)
+        currentPix = stack.pop()
+        visitedList.append(currentPix)
+        validNeighbors = findingValidNeighbors(image, currentPix, visitedList, thres,x)
+        stack.extend(validNeighbors)
+    return create_mask(visitedList, row, col)
 
-def finding_valid_neighbours(image, current_pix, visited_lst, thres):
-    row, col = image.shape
+def findingValidNeighbors(image, currentPix, visitedList, thres,x):
+    row, col,_ = image.shape
     neighbour_direction = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-    valid_neighbours = []
+    validNeighbors = []
 
     for direction in neighbour_direction:
-        nb = (current_pix[0] + direction[0], current_pix[1] + direction[1])
-        if is_indeed_valid_neighbour(nb, row, col, image, current_pix, thres, visited_lst):
-            valid_neighbours.append(nb)
-    return valid_neighbours
+        nb = (currentPix[0] + direction[0], currentPix[1] + direction[1])
+        if isValidNeighbor(nb, row, col, image, currentPix, thres, visitedList,x):
+            validNeighbors.append(nb)
+    return validNeighbors
 
-def is_indeed_valid_neighbour(nb, row, col, image, current_pix, thres, visited_lst):
-    return (0 <= nb[0] < row and 0 <= nb[1] < col and 
-            distance(image, nb, current_pix) <= thres and distance(image, nb, current_pix) <= thres and nb not in visited_lst)
+def isValidNeighbor(nb, row, col, image, currentPix, thres, visitedList,x):
+    return (0 <= nb[0] < row and 0 <= nb[1] < col and distance(image, nb, x) <= thres and nb not in visitedList)
 
 def create_mask(visitedList, row, col):
     msk = np.zeros((row, col), dtype=int)

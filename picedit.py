@@ -112,24 +112,32 @@ def distance(image, pix1, pix2):
     return math.sqrt((2 + redAvg / 256) * (deltaRed ** 2) + 4 * (deltaGreen ** 2) + (2 + (255 - redAvg) / 256) * (deltaBlue ** 2))
 
 def magic_wand_select(image, x, thres):                
-    row, col = np.shape(image)[:2]
-    stack = [x]
-    visitedList = []
-    neighbour_directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    row, col = image.shape
+    stack = []
+    stack.append(x)
+    visited_lst = []
 
     while len(stack) > 0:
         current_pix = stack.pop()
-        if current_pix not in visitedList:
-            visitedList.append(current_pix)
-            for direction in neighbour_directions:
-                nb = (current_pix[0] + direction[0], current_pix[1] + direction[1])
-                if (0 <= nb[0] < row and 0 <= nb[1] < col and 
-                    distance(image, nb, x) <= thres and 
-                    nb not in visitedList):
-                    stack.append(nb)
-                    
-    return create_mask(visitedList, row, col)
+        visited_lst.append(current_pix)
+        valid_neighbours = finding_valid_neighbours(image, current_pix, visited_lst, thres)
+        stack.extend(valid_neighbours)
+    return create_mask(visited_lst, row, col)
 
+def finding_valid_neighbours(image, current_pix, visited_lst, thres):
+    row, col = image.shape
+    neighbour_direction = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    valid_neighbours = []
+
+    for direction in neighbour_direction:
+        nb = (current_pix[0] + direction[0], current_pix[1] + direction[1])
+        if is_indeed_valid_neighbour(nb, row, col, image, current_pix, thres, visited_lst):
+            valid_neighbours.append(nb)
+    return valid_neighbours
+
+def is_indeed_valid_neighbour(nb, row, col, image, current_pix, thres, visited_lst):
+    return (0 <= nb[0] < row and 0 <= nb[1] < col and 
+            distance(image, nb, current_pix) <= thres and distance(image, nb, current_pix) <= thres and nb not in visited_lst)
 
 def create_mask(visitedList, row, col):
     msk = np.zeros((row, col), dtype=int)
@@ -378,7 +386,6 @@ def menu():
                     break                 
                 except ValueError:
                     print("Invalid input. Please enter an integer value.")
-
             start_time = time.time()
             top = (x1, y1)
             bottom = (x2, y2)

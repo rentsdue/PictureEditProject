@@ -5,59 +5,64 @@ import math
 import time 
 
 def change_brightness(image, value):
-    rows, columns, colors = image.shape
+    rows, columns, colors = image.shape # Use this to get variables for iterating across the for loop (image.shape accesses the dimensions of the image array)
     brightImg = image.copy()
     for i in range(rows): 
         for j in range(columns):
             for k in range(colors):
                 brightImg[i][j][k] += value
-                if (brightImg[i][j][k] > 255):
+                if (brightImg[i][j][k] > 255): # Ensures that the RGB value does not exceed 255
                     brightImg[i][j][k] = 255
-                if (brightImg[i][j][k] < 0):
+                if (brightImg[i][j][k] < 0): # Ensures that the RGB value does not go below 0
                     brightImg[i][j][k] = 0
 
     return brightImg
 
+# Same principle from the change_brightness function regarding geting variables via image.shape and using a for loop
 def change_contrast(image, value):
     rows, columns, colors = image.shape
     contrastImg = image.copy()
-    factor = (259 * (value + 255)) / (255 * (259 - value))
+    factor = (259 * (value + 255)) / (255 * (259 - value)) # Formula taken from section 2.2.2 of project pdf
     for i in range(rows): 
         for j in range(columns):
             for k in range(colors):
-                contrastImg[i][j][k] = factor * (image[i][j][k] - 128) + 128 
-                if (contrastImg[i][j][k] > 255): 
+                contrastImg[i][j][k] = factor * (image[i][j][k] - 128) + 128  # Uses formula from section 2.2.2
+                if (contrastImg[i][j][k] > 255): # Ensures that the RGB value does not exceed 255
                     contrastImg[i][j][k] = 255
-                elif (contrastImg[i][j][k] < 0):
+                elif (contrastImg[i][j][k] < 0): # Ensures that the RGB value does not go below 0
                     contrastImg[i][j][k] = 0
     return contrastImg
 
+# Uses image.shape to obtain the values of rows, columns, colors so that they can be iterated via a for loop
 def grayscale(image):
     rows, columns, colors = image.shape
     grayImg = image.copy()
     for i in range(rows):
         for j in range(columns):
-            red = grayImg[i][j][0]
-            green = grayImg[i][j][1]
-            blue = grayImg[i][j][2]
-            grayscaled = int(0.3 * red + 0.59 * green + 0.11 * blue)
+            red = grayImg[i][j][0] # Red is the first color in "RGB", so array index is 0
+            green = grayImg[i][j][1]  # Green is the second color in "RGB", so array index is 1
+            blue = grayImg[i][j][2]  # Blue is the third color in "RGB", so array index is 2
+            grayscaled = int(0.3 * red + 0.59 * green + 0.11 * blue) # Formula taken from section 2.2.4
             for k in range(colors):
-                grayImg[i][j][k] = grayscaled
+                grayImg[i][j][k] = grayscaled # Replaces value
     return grayImg 
 
 def blur_effect(image):
     blurredImg = image.copy()
     rows, columns, colors = image.shape
+    # Need to add this adjustment since corner pixels do not have neighbors, leading to out of bound errors (used for edge detection/emboss as well)
     for i in range(1, rows- 1): 
         for j in range(1, columns - 1):
             for k in range(colors):
+                # Formula taken from section 2.2.5
                 blurredImg[i][j][k] = 0.0625 * image[i - 1][j - 1][k] + 0.125 * image[i - 1][j][k] + 0.0625 * image[i - 1][j + 1][k]  + 0.125 * image[i][j - 1][k]  + 0.25 * image[i][j][k] + 0.125 * image[i][j + 1][k]+ 0.0625 * image[i + 1][j - 1][k] + 0.125 * image[i + 1][j][k] + 0.0625 * image[i + 1][j + 1][k]
                 if (blurredImg[i][j][k] > 255):  
-                    blurredImg[i][j][k] = 255
+                    blurredImg[i][j][k] = 255  # Ensures that the RGB value does not exceed 255 
                 elif (blurredImg[i][j][k] < 0):
-                    blurredImg[i][j][k] = 0
+                    blurredImg[i][j][k] = 0 # Ensures that the RGB value does not go below 0
     return blurredImg 
 
+#Same principle from blur_effect function, but the formula taken is from section 2.2.6
 def edge_detection(image):
     newImg = image.copy()
     rows, columns, colors = image.shape
@@ -65,13 +70,14 @@ def edge_detection(image):
         for j in range(1, columns - 1):
             for k in range(colors):
                 newImg[i][j][k] =  (-1 * image[i - 1][j - 1][k]) + (-1 * image[i - 1][j][k]) + (-1 * image[i - 1][j + 1][k] ) + (-1 * image[i][j - 1][k]) + (8 * image[i][j][k]) + (-1 * image[i][j + 1][k]) + (-1 * image[i + 1][j - 1][k]) + (-1 * image[i + 1][j][k]) + (-1 * image[i + 1][j + 1][k]) 
-                newImg[i][j][k] += 128
-                if (newImg[i][j][k] > 255):  
+                newImg[i][j][k] += 128 # Reminder to add 128 after adding convolution kernel
+                if (newImg[i][j][k] > 255): # "Clamps" RGB value
                     newImg[i][j][k] = 255
                 elif (newImg[i][j][k] < 0):
                     newImg[i][j][k] = 0
     return newImg 
 
+#Same principle from blur_effect function, but the formula taken is from section 2.2.7
 def embossed(image):
     newImg = image.copy()
     rows, columns, colors = image.shape
@@ -79,7 +85,7 @@ def embossed(image):
         for j in range(1, columns - 1):
             for k in range(colors):
                 newImg[i][j][k] =  (-1 * image[i - 1][j - 1][k]) + (-1 * image[i - 1][j][k]) + (-1 * image[i][j - 1][k]) + (image[i][j + 1][k]) + (image[i + 1][j][k]) + (image[i + 1][j + 1][k]) 
-                newImg[i][j][k] += 128
+                newImg[i][j][k] += 128  # Reminder to add 128 after adding convolution kernel
                 if (newImg[i][j][k] > 255):  
                     newImg[i][j][k] = 255
                 elif (newImg[i][j][k] < 0):
@@ -221,9 +227,9 @@ def display_image(image, mask):
     print("Image size is",str(len(image)),"x",str(len(image[0])))
 
 def applyMask(newImage, originalImage, mask):
-    finalImage = originalImage.copy()
-    for i in range(len(originalImage)):
-        for j in range(len(originalImage[i])):
+    finalImage = originalImage.copy() # Creates a copy of the original image
+    for i in range(len(originalImage)): # Iterates through the rows
+        for j in range(len(originalImage[i])): # Iterates through each individual cell in the row
             if(mask[i][j]==1):
                 finalImage[i][j]= newImage[i][j]
             else:
@@ -231,6 +237,8 @@ def applyMask(newImage, originalImage, mask):
     return finalImage
 
 def menu():
+    
+    # Create "None" and boolean variables
     image = None
     newImg = None
     mask = None

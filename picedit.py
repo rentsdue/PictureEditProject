@@ -424,7 +424,7 @@ def menu():
                 except ValueError:
                     print("Invalid input. Please enter an integer value.")
             start_time = time.time()
-            newMask = magic_wand_select(image, (xCoord, yCoord), thres)
+            newMask = magic_wand_select(image, (yCoord, xCoord), thres)
             useNewMask = True
             end_time = time.time()
             print(f"Magic wand selection applied in {end_time - start_time:.4f} seconds.")

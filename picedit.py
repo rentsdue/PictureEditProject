@@ -113,30 +113,25 @@ def distance(image, pix1, pix2):
 
 def magic_wand_select(image, x, thres):                
     row, col = np.shape(image)[:2]
-    stack = []
-    stack.append(x)
+    stack = [x]
     visitedList = []
 
     while len(stack) > 0:
         currentPix = stack.pop()
         visitedList.append(currentPix)
-        validNeighbors = findingValidNeighbors(image, currentPix, visitedList, thres,x)
-        stack.extend(validNeighbors)
+        neighbour_direction = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+        for direction in neighbour_direction:
+            nb = (currentPix[0] + direction[0], currentPix[1] + direction[1])
+
+            # Checking if there are valid neighbors
+            if (0 <= nb[0] < row and 0 <= nb[1] < col 
+                and distance(image, nb, x) <= thres 
+                and nb not in visitedList):
+                stack.append(nb)
+
     return create_mask(visitedList, row, col)
 
-def findingValidNeighbors(image, currentPix, visitedList, thres,x):
-    row, col,_ = image.shape
-    neighbour_direction = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-    validNeighbors = []
-
-    for direction in neighbour_direction:
-        nb = (currentPix[0] + direction[0], currentPix[1] + direction[1])
-        if isValidNeighbor(nb, row, col, image, currentPix, thres, visitedList,x):
-            validNeighbors.append(nb)
-    return validNeighbors
-
-def isValidNeighbor(nb, row, col, image, currentPix, thres, visitedList,x):
-    return (0 <= nb[0] < row and 0 <= nb[1] < col and distance(image, nb, x) <= thres and nb not in visitedList)
 
 def create_mask(visitedList, row, col):
     msk = np.zeros((row, col), dtype=int)
@@ -386,8 +381,8 @@ def menu():
                 except ValueError:
                     print("Invalid input. Please enter an integer value.")
             start_time = time.time()
-            top = (x1, y1)
-            bottom = (x2, y2)
+            top = (y1, x1)
+            bottom = (y2, x2)
             newMask = rectangle_select(image, top, bottom)
             useNewMask = True
             end_time = time.time()

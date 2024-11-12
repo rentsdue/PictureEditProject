@@ -93,20 +93,21 @@ def embossed(image):
     return newImg 
 
 def rectangle_select(image, x, y):
+    #Defining parameters of the function rectangle select
     rows = np.shape(image)[0]
     cols = np.shape(image)[1]
-    #defining parameters of function rectangle select
 
-    x_i = x[0] #initial x-coordinate of rectangle
-    x_f = x[1] #final x-coordinate of rectangle
-    y_i = y[0] #initial y-coordinate of rectangle
-    y_f = y[1] #final y-coordinate of rectangle
+    x_i = x[0] # Initial x-coordinate of rectangle
+    x_f = x[1] # Final x-coordinate of rectangle
+    y_i = y[0] # Initial y-coordinate of rectangle
+    y_f = y[1] # Final y-coordinate of rectangle
     
 
     rect = np.zeros((rows, cols))   
-    rect[x_i : y_i + 1, x_f : y_f + 1] = 1 #fix the range of rectangle with its diagonal from point (x_i, y_i) to (x_f, y_f)
+    rect[x_i : y_i + 1, x_f : y_f + 1] = 1 # Fix the range of rectangle with its diagonal from point (x_i, y_i) to (x_f, y_f)
 
-    print(rect) #output the rectangle function
+    #Output the rectangle function
+    print(rect) 
     return rect
 
 def distance(image, pix1, pix2):
@@ -225,14 +226,18 @@ def display_image(image, mask):
     plt.imshow(tmp_img)
     plt.axis('off')
     plt.show()
-    print("Image size is",str(len(image)),"x",str(len(image[0])))
+
+    # Changed from y-x to x-y
+    print("Image size is",str(len(image[0])),"x",str(len(image)))
 
 def applyMask(newImage, originalImage, mask):
     finalImage = originalImage.copy() # Creates a copy of the original image
     for i in range(len(originalImage)): # Iterates through the rows
         for j in range(len(originalImage[i])): # Iterates through each individual cell in the row
-            if(mask[i][j]==1):
-                finalImage[i][j]= newImage[i][j]
+
+            # Checks whether or not to copy the pixel or not
+            if (mask[i][j] == 1):
+                finalImage[i][j] = newImage[i][j] 
             else:
                 pass
     return finalImage
@@ -246,20 +251,42 @@ def menu():
     newMask = None
     useNewMask = False
 
+    # Initial menu (with only "exit" and "load" options)
     while True:
         if image is None:
+            # When user hasn't uploaded an image
             userSelect = input("What do you want to do ? \n e - exit \n l - load a picture \n \n Your choice: ")
         else: 
+            # When user has uploaded an image
             userSelect = input("What do you want to do ? \n e - exit \n l - load a picture \n s - save the current picture \n 1 - adjust brightness \n 2 - adjust contrast \n 3 - apply grayscale \n 4 - apply blur \n 5 - edge detection \n 6 - embossed \n 7 - rectangle select \n 8 - magic wand select \n \n Your choice: ")
         
+        # Done to exit the program
         if userSelect == "e":
             print("Thank you very much for using this picture editor. Have a nice day!")
             break
         elif userSelect == "l":
             while True:
                 try:
-                    filename = input("Enter the filename to load: ")
-                    # Creates a timer so we know how long
+                    # List of forbidden characters for file names
+                    forbiddenChars = ['<', '>', ':', '"', '/', '\\', '|', '?', '*']  
+                    while True:
+                        filename = input("Enter the filename to load: ")
+                        hasForbiddenChar = False
+                        
+                        # Check if any forbidden characters are in the input
+                        for char in filename:
+                            if char in forbiddenChars:
+                                print(f"Filename contains forbidden character '{char}'. Please enter a valid filename.")
+                                hasForbiddenChar = True
+                                break  # Exit the for loop early if a forbidden character is found
+                            else:
+                                break
+                        
+                        # Ends loop if there are no forbidden characters
+                        if not hasForbiddenChar:
+                            break
+
+                    # Continue with your code
                     start_time = time.time()
                     image, mask = load_image(filename)
                     newImg = image.copy()
@@ -272,8 +299,24 @@ def menu():
             print(f"Image loaded in {end_time - start_time:.4f} seconds.")
         
         elif userSelect == "s" and image is not None:
+            #Start timer
             start_time = time.time()
-            newFileName = input("Enter the name of your new file: ")
+            forbiddenChars = ['<', '>', ':', '"', '/', '\\', '|', '?', '*']  
+            while True:
+                newFileName = input("Enter the name of your new file: ")
+                hasForbiddenChar = False
+                # Check if any forbidden characters are in the input (same logic as above)
+                for char in newFileName:
+                    if char in forbiddenChars:
+                        print(f"Filename contains forbidden character '{char}'. Please enter a valid filename.")
+                        hasForbiddenChar = True
+                        break  # Exit the for loop early if a forbidden character is found
+                
+                # Ends loop if there are no forbidden characters
+                if not hasForbiddenChar:
+                    break
+
+            # Choose format for someone to save it as (in case they forget to type the file type)
             while True:
                 imgFormat = input("What would you like to save your format as? Click 1 for .jpg, Click 2 for .png! ")
                 if imgFormat == "1":
@@ -284,38 +327,56 @@ def menu():
                     break
                 else:
                     print("Invalid input. Please try again!")
+            
+            # Calls the save function           
             save_image(newFileName + imgFormat, newImg.astype('uint8'))
             end_time = time.time()
             print(f"Image saved in {end_time - start_time:.4f} seconds.")
         
-        elif userSelect == "1" and image is not None:
+        # Note if userSelected == "1" and image is None, it tells the user to prompt something else
+        elif userSelect == "1" and image is not None: 
             while True:
+                # "Try block" to handle issues if the user accidentally puts in a float or string
                 try:
                     rgbValue = int(input("Enter an input value to change the image brightness (has to be an integer): "))
+                    # Checks if valid is acceptable
                     if rgbValue < -250 or rgbValue > 250:
                         print("Please input an integer between -250 and 250")
                         continue
                     break
                 except ValueError:
                     print("Invalid input. Please enter an integer.")
+            # Start function timer
             start_time = time.time()
+
+            # Execute function
             modifiedImg = change_brightness(newImg, rgbValue)
+
+            # Check if the new mask needs to be used (when 7/8 has been selected)
             if useNewMask:
                 newImg = applyMask(modifiedImg, newImg, newMask) 
             else:
                 newImg = modifiedImg
+
+            # Stops function timer
             end_time = time.time()
             print(f"Brightness adjusted in {end_time - start_time:.4f} seconds.")
-            display_image(newImg, mask)
+            display_image(newImg, mask) # Displays the image desired
         
+        # Note if userSelected == "2" and image is None, it tells the user to prompt something else
         elif userSelect == "2" and image is not None:
             while True:
+                # "Try block" to handle issues if the user accidentally puts in a float or string
                 try:
                     contrastValue = int(input("Enter an input value to change the image contrast (has to be an integer): "))
                     break 
                 except ValueError:
                     print("Invalid input. Please enter an integer.")
+
+            # Timer starts
             start_time = time.time()
+
+            # Execute function
             modifiedImg = change_contrast(newImg, contrastValue)
             if useNewMask:
                 newImg = applyMask(modifiedImg, newImg, newMask) 
@@ -325,9 +386,14 @@ def menu():
             print(f"Contrast adjusted in {end_time - start_time:.4f} seconds.")
             display_image(newImg, mask)
         
+        # Note if userSelected == "3" and image is None, it tells the user to prompt something else
         elif userSelect == "3" and image is not None:
             start_time = time.time()
+
+            # Execute function
             modifiedImg = grayscale(newImg)
+            
+            # Check if the new mask needs to be used (when 7/8 has been selected)
             if useNewMask:
                 newImg = applyMask(modifiedImg, newImg, newMask) 
             else:
@@ -336,9 +402,14 @@ def menu():
             print(f"Grayscale applied in {end_time - start_time:.4f} seconds.")
             display_image(newImg, mask)
         
+        # Note if userSelected == "4" and image is None, it tells the user to prompt something else
         elif userSelect == "4" and image is not None:
             start_time = time.time()
+
+            # Execute function
             modifiedImg = blur_effect(newImg)
+
+            # Check if the new mask needs to be used (when 7/8 has been selected)
             if useNewMask:
                 newImg = applyMask(modifiedImg, newImg, newMask)  
             else:
@@ -347,9 +418,12 @@ def menu():
             print(f"Blur applied in {end_time - start_time:.4f} seconds.")
             display_image(newImg, mask)
         
+        # Note if userSelected == "5" and image is None, it tells the user to prompt something else
         elif userSelect == "5" and image is not None:
             start_time = time.time()
             modifiedImg = edge_detection(newImg)
+
+            # Check if the new mask needs to be used (when 7/8 has been selected)
             if useNewMask:
                 newImg = applyMask(modifiedImg, newImg, newMask) 
             else:
@@ -358,9 +432,14 @@ def menu():
             print(f"Edge detection applied in {end_time - start_time:.4f} seconds.")
             display_image(newImg, mask)
         
+        # Note if userSelected == "6" and image is None, it tells the user to prompt something else
         elif userSelect == "6" and image is not None:
             start_time = time.time()
+
+            # Execute function
             modifiedImg = embossed(newImg)
+
+            # Check if the new mask needs to be used (when 7/8 has been selected)
             if (useNewMask):
                 newImg = applyMask(modifiedImg, newImg, newMask)  
             else:
@@ -369,8 +448,10 @@ def menu():
             print(f"Embossing applied in {end_time - start_time:.4f} seconds.")
             display_image(newImg, mask)
         
+        # Note if userSelected == "7" and image is None, it tells the user to prompt something else
         elif userSelect == "7" and image is not None:
             while True:
+                # Checks for x1, x2, y1, y2 values and ensures that they are valid
                 try:
                     while True:
                         x1 = int(input(f"Enter the x-coordinate of the top left corner of the rectangle (Must be an integer between 0 to {image.shape[1] - 1}): "))
@@ -413,11 +494,13 @@ def menu():
                             break
                     break                 
                 except ValueError:
-                    print("Invalid input. Please enter an integer value.")
+                    print("Invalid input. Please enter an integer value.") # Checks for error
             start_time = time.time()
             top = (y1, x1) # y1, x1 this order since it is row-column format
-            bottom = (y2, x2) 
+            bottom = (y2, x2) # y2, x2 this order since it is row-column format
             newMask = rectangle_select(image, top, bottom)
+
+            # So that 1-6 can appropriately switch to the applyMask function
             useNewMask = True
             end_time = time.time()
             print(f"Rectangle selected in {end_time - start_time:.4f} seconds.")
@@ -427,6 +510,7 @@ def menu():
         elif userSelect == "8" and image is not None:
             while True:
                 try:
+                    # Checks for x, y, and threshold values and ensures that they are valid
                     while True:
                         xCoord = int(input(f"Please enter an x-coordinate (Must be between 0 and {image.shape[1] - 1}): "))
                         if xCoord < 0:
@@ -453,7 +537,9 @@ def menu():
                 except ValueError:
                     print("Invalid input. Please enter an integer value.")
             start_time = time.time()
-            newMask = magic_wand_select(image, (yCoord, xCoord), thres)
+            newMask = magic_wand_select(image, (yCoord, xCoord), thres) # Since row-col tuple, y and x coordinates switch
+
+            # So that 1-6 can appropriately switch to the applyMask function
             useNewMask = True
             end_time = time.time()
             print(f"Magic wand selection applied in {end_time - start_time:.4f} seconds.")

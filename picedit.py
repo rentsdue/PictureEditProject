@@ -258,6 +258,7 @@ def menu():
             while True:
                 try:
                     filename = input("Enter the filename to load: ")
+                    # Creates a timer so we know how long
                     start_time = time.time()
                     image, mask = load_image(filename)
                     newImg = image.copy()
@@ -289,8 +290,7 @@ def menu():
         elif userSelect == "1" and image is not None:
             while True:
                 try:
-                    rgbValue = int(
-                        input("Enter an input value to change the image brightness (has to be an integer): "))
+                    rgbValue = int(input("Enter an input value to change the image brightness (has to be an integer): "))
                     if rgbValue < -250 or rgbValue > 250:
                         print("Please input an integer between -250 and 250")
                         continue
@@ -414,8 +414,8 @@ def menu():
                 except ValueError:
                     print("Invalid input. Please enter an integer value.")
             start_time = time.time()
-            top = (y1, x1)
-            bottom = (y2, x2)
+            top = (y1, x1) # y1, x1 this order since it is row-column format
+            bottom = (y2, x2) 
             newMask = rectangle_select(image, top, bottom)
             useNewMask = True
             end_time = time.time()

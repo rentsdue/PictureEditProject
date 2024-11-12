@@ -95,17 +95,18 @@ def embossed(image):
 def rectangle_select(image, x, y):
     rows = np.shape(image)[0]
     cols = np.shape(image)[1]
+    #defining parameters of function rectangle select
 
-    x_i = x[0]
-    x_f = x[1]
-    y_i = y[0]
-    y_f = y[1]
+    x_i = x[0] #initial x-coordinate of rectangle
+    x_f = x[1] #final x-coordinate of rectangle
+    y_i = y[0] #initial y-coordinate of rectangle
+    y_f = y[1] #final y-coordinate of rectangle
     
 
     rect = np.zeros((rows, cols))   
-    rect[x_i : y_i + 1, x_f : y_f + 1] = 1
+    rect[x_i : y_i + 1, x_f : y_f + 1] = 1 #fix the range of rectangle with its diagonal from point (x_i, y_i) to (x_f, y_f)
 
-    print(rect)
+    print(rect) #output the rectangle function
     return rect
 
 def distance(image, pix1, pix2):

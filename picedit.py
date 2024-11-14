@@ -145,11 +145,11 @@ def magic_wand_select(image, x, thres):
 def findingValidNeighbors(image, currentPix, visitedList, thres,x):
     row, col,_ = image.shape
     #Up, down, left, right respectively
-    neighbour_direction = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    neighborDirection = [(-1, 0), (1, 0), (0, -1), (0, 1)]
     #List to store valid neighbors
     validNeighbors = []
 
-    for direction in neighbour_direction:
+    for direction in neighborDirection:
         nb = (currentPix[0] + direction[0], currentPix[1] + direction[1])
         #Checking if neighbor is valid or not (not out of bounds, within threshold, not visited)
         #Then adding them if they are valid
@@ -234,7 +234,6 @@ def applyMask(newImage, originalImage, mask):
     finalImage = originalImage.copy() # Creates a copy of the original image
     for i in range(len(originalImage)): # Iterates through the rows
         for j in range(len(originalImage[i])): # Iterates through each individual cell in the row
-
             # Checks whether or not to copy the pixel or not
             if (mask[i][j] == 1):
                 finalImage[i][j] = newImage[i][j] 
@@ -247,9 +246,9 @@ def menu():
     # Create "None" and boolean variables
     image = None
     newImg = None
-    mask = None
+    mask = None 
     newMask = None
-    useNewMask = False
+    useNewMask = False # Used for 7/8 logic later
 
     # Initial menu (with only "exit" and "load" options)
     while True:
@@ -267,7 +266,7 @@ def menu():
         elif userSelect == "l":
             while True:
                 try:
-                    # List of forbidden characters for file names
+                    # List of forbidden characters for file names (tested on a Microsoft, and those are the forbidden ones)
                     forbiddenChars = ['<', '>', ':', '"', '/', '\\', '|', '?', '*']  
                     while True:
                         filename = input("Enter the filename to load: ")
@@ -293,10 +292,10 @@ def menu():
                     display_image(image, mask)
                     break
                 except Exception as e:
-                    print(f"An error occurred: {e}. Please enter a valid file name. You might have forgotten to input \".jpg\" or \".png\" in your file name.")
+                    print(f"An error occurred: {e}. Please enter a valid file name. You might have forgotten to input \".jpg\" or \".png\" or some other file format in your file name.")
             
             end_time = time.time()
-            print(f"Image loaded in {end_time - start_time:.4f} seconds.")
+            print(f"Image loaded in {end_time - start_time} seconds.")
         
         elif userSelect == "s" and image is not None:
             #Start timer
@@ -318,20 +317,23 @@ def menu():
 
             # Choose format for someone to save it as (in case they forget to type the file type)
             while True:
-                imgFormat = input("What would you like to save your format as? Click 1 for .jpg, Click 2 for .png! ")
+                imgFormat = input("What would you like to save your format as? Click 1 for .jpg, Click 2 for .png, Click 3 for .gif! ")
                 if imgFormat == "1":
                     imgFormat = ".jpg"
                     break
                 elif imgFormat == "2":
                     imgFormat = ".png"
                     break
+                elif imgFormat == "3":
+                    imgFormat = ".gif"
+                    break
                 else:
                     print("Invalid input. Please try again!")
             
             # Calls the save function           
-            save_image(newFileName + imgFormat, newImg.astype('uint8'))
+            save_image(newFileName + imgFormat, newImg)
             end_time = time.time()
-            print(f"Image saved in {end_time - start_time:.4f} seconds.")
+            print(f"Image saved in {end_time - start_time} seconds.")
         
         # Note if userSelected == "1" and image is None, it tells the user to prompt something else
         elif userSelect == "1" and image is not None: 
@@ -339,13 +341,13 @@ def menu():
                 # "Try block" to handle issues if the user accidentally puts in a float or string
                 try:
                     rgbValue = int(input("Enter an input value to change the image brightness (has to be an integer): "))
-                    # Checks if valid is acceptable
+                    # Checks if value is acceptable
                     if rgbValue < -250 or rgbValue > 250:
-                        print("Please input an integer between -250 and 250")
+                        print("Please input an integer between -250 and 250. This exceeds the RGB maximum value (255) or minimum value (0).")
                         continue
                     break
                 except ValueError:
-                    print("Invalid input. Please enter an integer.")
+                    print("Invalid input. Please enter an integer.") # In case user inputs float/string
             # Start function timer
             start_time = time.time()
 
@@ -360,7 +362,7 @@ def menu():
 
             # Stops function timer
             end_time = time.time()
-            print(f"Brightness adjusted in {end_time - start_time:.4f} seconds.")
+            print(f"Brightness adjusted in {end_time - start_time} seconds.")
             display_image(newImg, mask) # Displays the image desired
         
         # Note if userSelected == "2" and image is None, it tells the user to prompt something else
@@ -383,7 +385,7 @@ def menu():
             else:
                 newImg = modifiedImg
             end_time = time.time()
-            print(f"Contrast adjusted in {end_time - start_time:.4f} seconds.")
+            print(f"Contrast adjusted in {end_time - start_time} seconds.")
             display_image(newImg, mask)
         
         # Note if userSelected == "3" and image is None, it tells the user to prompt something else
@@ -399,7 +401,7 @@ def menu():
             else:
                 newImg = modifiedImg
             end_time = time.time()
-            print(f"Grayscale applied in {end_time - start_time:.4f} seconds.")
+            print(f"Grayscale applied in {end_time - start_time} seconds.")
             display_image(newImg, mask)
         
         # Note if userSelected == "4" and image is None, it tells the user to prompt something else
@@ -415,7 +417,7 @@ def menu():
             else:
                 newImg = modifiedImg
             end_time = time.time()
-            print(f"Blur applied in {end_time - start_time:.4f} seconds.")
+            print(f"Blur applied in {end_time - start_time} seconds.")
             display_image(newImg, mask)
         
         # Note if userSelected == "5" and image is None, it tells the user to prompt something else
@@ -429,7 +431,7 @@ def menu():
             else:
                 newImg = modifiedImg
             end_time = time.time()
-            print(f"Edge detection applied in {end_time - start_time:.4f} seconds.")
+            print(f"Edge detection applied in {end_time - start_time} seconds.")
             display_image(newImg, mask)
         
         # Note if userSelected == "6" and image is None, it tells the user to prompt something else
@@ -445,7 +447,7 @@ def menu():
             else:
                 newImg = modifiedImg
             end_time = time.time()
-            print(f"Embossing applied in {end_time - start_time:.4f} seconds.")
+            print(f"Embossing applied in {end_time - start_time} seconds.")
             display_image(newImg, mask)
         
         # Note if userSelected == "7" and image is None, it tells the user to prompt something else
@@ -503,7 +505,7 @@ def menu():
             # So that 1-6 can appropriately switch to the applyMask function
             useNewMask = True
             end_time = time.time()
-            print(f"Rectangle selected in {end_time - start_time:.4f} seconds.")
+            print(f"Rectangle selected in {end_time - start_time} seconds.")
             display_image(newImg, newMask)
 
         
@@ -542,7 +544,7 @@ def menu():
             # So that 1-6 can appropriately switch to the applyMask function
             useNewMask = True
             end_time = time.time()
-            print(f"Magic wand selection applied in {end_time - start_time:.4f} seconds.")
+            print(f"Magic wand selection applied in {end_time - start_time} seconds.")
             display_image(newImg, newMask)
         
         else:

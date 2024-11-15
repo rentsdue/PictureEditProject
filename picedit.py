@@ -243,7 +243,7 @@ def applyMask(newImage, originalImage, mask):
 
 def menu():
     
-    # Create "None" and boolean variables
+    # Create "None" variables since they don't exist yet when the code loads
     image = None
     newImg = None
     mask = None 

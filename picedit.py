@@ -248,7 +248,6 @@ def menu():
     newImg = None
     mask = None 
     newMask = None
-    useNewMask = False # Used for 7/8 logic later
 
     # Initial menu (with only "exit" and "load" options)
     while True:
@@ -286,7 +285,7 @@ def menu():
                             break
 
                     # Continue with your code
-                    start_time = time.time()
+                    start_time = time.time() 
                     image, mask = load_image(filename)
                     newImg = image.copy()
                     display_image(image, mask)
@@ -355,7 +354,7 @@ def menu():
             modifiedImg = change_brightness(newImg, rgbValue)
 
             # Check if the new mask needs to be used (when 7/8 has been selected)
-            if useNewMask:
+            if newMask is not None:
                 newImg = applyMask(modifiedImg, newImg, newMask) 
             else:
                 newImg = modifiedImg
@@ -380,7 +379,7 @@ def menu():
 
             # Execute function
             modifiedImg = change_contrast(newImg, contrastValue)
-            if useNewMask:
+            if newMask is not None:
                 newImg = applyMask(modifiedImg, newImg, newMask) 
             else:
                 newImg = modifiedImg
@@ -396,7 +395,7 @@ def menu():
             modifiedImg = grayscale(newImg)
             
             # Check if the new mask needs to be used (when 7/8 has been selected)
-            if useNewMask:
+            if newMask is not None:
                 newImg = applyMask(modifiedImg, newImg, newMask) 
             else:
                 newImg = modifiedImg
@@ -412,7 +411,7 @@ def menu():
             modifiedImg = blur_effect(newImg)
 
             # Check if the new mask needs to be used (when 7/8 has been selected)
-            if useNewMask:
+            if newMask is not None:
                 newImg = applyMask(modifiedImg, newImg, newMask)  
             else:
                 newImg = modifiedImg
@@ -426,7 +425,7 @@ def menu():
             modifiedImg = edge_detection(newImg)
 
             # Check if the new mask needs to be used (when 7/8 has been selected)
-            if useNewMask:
+            if newMask is not None:
                 newImg = applyMask(modifiedImg, newImg, newMask) 
             else:
                 newImg = modifiedImg
@@ -442,7 +441,7 @@ def menu():
             modifiedImg = embossed(newImg)
 
             # Check if the new mask needs to be used (when 7/8 has been selected)
-            if (useNewMask):
+            if (newMask is not None):
                 newImg = applyMask(modifiedImg, newImg, newMask)  
             else:
                 newImg = modifiedImg
@@ -501,9 +500,6 @@ def menu():
             top = (y1, x1) # y1, x1 this order since it is row-column format
             bottom = (y2, x2) # y2, x2 this order since it is row-column format
             newMask = rectangle_select(image, top, bottom)
-
-            # So that 1-6 can appropriately switch to the applyMask function
-            useNewMask = True
             end_time = time.time()
             print(f"Rectangle selected in {end_time - start_time} seconds.")
             display_image(newImg, newMask)
@@ -540,9 +536,6 @@ def menu():
                     print("Invalid input. Please enter an integer value.")
             start_time = time.time()
             newMask = magic_wand_select(image, (yCoord, xCoord), thres) # Since row-col tuple, y and x coordinates switch
-
-            # So that 1-6 can appropriately switch to the applyMask function
-            useNewMask = True
             end_time = time.time()
             print(f"Magic wand selection applied in {end_time - start_time} seconds.")
             display_image(newImg, newMask)

@@ -13,7 +13,7 @@ def change_brightness(image, value):
                 brightImg[i][j][k] += value
                 if (brightImg[i][j][k] > 255): # Ensures that the RGB value does not exceed 255
                     brightImg[i][j][k] = 255
-                if (brightImg[i][j][k] < 0): # Ensures that the RGB value does not go below 0
+                elif (brightImg[i][j][k] < 0): # Ensures that the RGB value does not go below 0
                     brightImg[i][j][k] = 0
 
     return brightImg
